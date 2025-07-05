@@ -9,4 +9,5 @@
     Teleport = 6,
     Locker = 7,
     Door = 8,
+    Interactable = 9,
 }

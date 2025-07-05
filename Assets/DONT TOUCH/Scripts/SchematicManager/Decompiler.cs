@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -44,7 +45,7 @@ public static class Decompiler
         Debug.Log("<color=#FFFF00>Importing schematic...</color>");
         
         CreateRecursiveFromID(_schematicData.RootObjectId, _schematicData.Blocks, _rootTransform);
-        CreateTeleporters();
+        CreateTeleporters(_schematicData.Blocks);
         AddRigidbodies();
 
         Debug.Log($"<color=#00FF00>Successfully imported <b>{_schematicName}</b> schematic in {stopwatch.ElapsedMilliseconds} ms!</color>");
@@ -267,6 +268,39 @@ public static class Decompiler
                 }
                 break;
             }
+            case BlockType.Teleport:
+            {
+                foreach (GameObject blockPrefab in _blockPrefabs)
+                {
+                    if (!blockPrefab.TryGetComponent(out TeleportComponent teleportComponent)) continue;
+                    var teleport = Object.Instantiate(teleportComponent, rootObject);
+                    gameObject = teleport.gameObject;
+                    teleport.name = block.Name;
+                    teleport.transform.localPosition = block.Position;
+                    teleport.transform.localEulerAngles = block.Rotation;
+                    teleport.transform.localScale = block.Scale;
+                    teleport.Cooldown = Convert.ToSingle(block.Properties["Cooldown"]);
+                }
+                break;
+            }
+            case BlockType.Interactable:
+            {
+                foreach (GameObject blockPrefab in _blockPrefabs)
+                {
+                    if (!blockPrefab.TryGetComponent(out InteractableComponent interactableComponent)) continue;
+                    var interactable = Object.Instantiate(interactableComponent, rootObject);
+                    gameObject = interactable.gameObject;
+                    interactable.name = block.Name;
+                    interactable.transform.localPosition = block.Position;
+                    interactable.transform.localEulerAngles = block.Rotation;
+                    interactable.transform.localScale = block.Scale;
+                    interactable.ColliderShape = (ColliderShape)Enum.Parse(typeof(ColliderShape), block.Properties["Shape"].ToString());
+                    interactable.InteractionDuration = Convert.ToSingle(block.Properties["InteractionDuration"]);
+                    interactable.IsLocked = (bool)block.Properties["IsLocked"];
+                    interactable.Init();
+                }
+                break;
+            }
         }
 
         if (TryGetAnimatorController(block.AnimatorName, out animatorController))
@@ -300,54 +334,80 @@ public static class Decompiler
         return false;
     }
 
-    private static void CreateTeleporters()
+    private static void CreateTeleporters(List<SchematicBlockData> blocks)
     {
-        string teleportPath = Path.Combine(_schematicDirectoryPath, $"{_schematicName}-Teleports.json");
-        if (!File.Exists(teleportPath))
-            return;
-
-        foreach (SerializableTeleport teleport in JsonConvert.DeserializeObject<List<SerializableTeleport>>(File.ReadAllText(teleportPath)))
+        var teleports = GameObject.FindObjectsOfType<TeleportComponent>();
+        foreach (var block in blocks)
         {
-            GameObject gameObject = Object.Instantiate(_blockPrefabs.FirstOrDefault(x => x.name == "Teleporter"));
-            gameObject.name = teleport.Name;
-            gameObject.transform.parent = _objectFromId[teleport.ParentId];
-            gameObject.transform.localPosition = teleport.Position;
-            gameObject.transform.localEulerAngles = teleport.Rotation;
-            gameObject.transform.localScale = teleport.Scale;
-
-            if (gameObject.TryGetComponent(out TeleportComponent teleportComponent))
+            if (block.BlockType != BlockType.Teleport) continue;
+            TeleportComponent source = null;
+            foreach (var teleportComponent in teleports)
             {
-                teleportComponent.TargetTeleporters = teleport.TargetTeleporters.ToArray();
-                teleportComponent.RoomType = teleport.RoomType;
-                teleportComponent.AllowedRoleTypes = teleport.AllowedRoles.ToArray();
-                teleportComponent.Cooldown = teleport.Cooldown;
-                teleportComponent.TeleportFlags = teleport.TeleportFlags;
-                teleportComponent.LockOnEvent = teleport.LockOnEvent;
-                teleportComponent.SoundOnTeleport = teleport.TeleportSoundId;
-
-                if (teleport.PlayerRotationX.HasValue)
+                if (teleportComponent.name == block.Name)
                 {
-                    teleportComponent.OverridePlayerXRotation = true;
-                    teleportComponent.PlayerRotationX = teleport.PlayerRotationX.Value;
-                }
-
-                if (teleport.PlayerRotationY.HasValue)
-                {
-                    teleportComponent.OverridePlayerYRotation = true;
-                    teleportComponent.PlayerRotationY = teleport.PlayerRotationY.Value;
+                    source = teleportComponent;
+                    break;
                 }
             }
-
-            _objectFromId.Add(teleport.ObjectId, gameObject.transform);
-        }
-
-        foreach (TeleportComponent teleport in _rootTransform.GetComponentsInChildren<TeleportComponent>())
-        {
-            foreach (TargetTeleporter targetTeleporter in teleport.TargetTeleporters)
+            if (source == null) continue;
+            foreach (var target in ((JArray)block.Properties["Targets"]).ToObject<List<string>>())
             {
-                targetTeleporter.Teleporter = _objectFromId[targetTeleporter.Id].GetComponent<TeleportComponent>();
+                foreach (var teleportComponent in teleports)
+                {
+                    if (teleportComponent.name == (string)target)
+                    {
+                        source.TargetTeleporters.Add(teleportComponent);
+                    }
+                }
             }
         }
+        
+        // string teleportPath = Path.Combine(_schematicDirectoryPath, $"{_schematicName}-Teleports.json");
+        // if (!File.Exists(teleportPath))
+        //     return;
+        //
+        // foreach (SerializableTeleport teleport in JsonConvert.DeserializeObject<List<SerializableTeleport>>(File.ReadAllText(teleportPath)))
+        // {
+        //     GameObject gameObject = Object.Instantiate(_blockPrefabs.FirstOrDefault(x => x.name == "Teleporter"));
+        //     gameObject.name = teleport.Name;
+        //     gameObject.transform.parent = _objectFromId[teleport.ParentId];
+        //     gameObject.transform.localPosition = teleport.Position;
+        //     gameObject.transform.localEulerAngles = teleport.Rotation;
+        //     gameObject.transform.localScale = teleport.Scale;
+        //
+        //     if (gameObject.TryGetComponent(out TeleportComponent teleportComponent))
+        //     {
+        //         // teleportComponent.TargetTeleporters = teleport.TargetTeleporters.ToArray();
+        //         // teleportComponent.RoomType = teleport.RoomType;
+        //         // teleportComponent.AllowedRoleTypes = teleport.AllowedRoles.ToArray();
+        //         teleportComponent.Cooldown = teleport.Cooldown;
+        //         // teleportComponent.TeleportFlags = teleport.TeleportFlags;
+        //         // teleportComponent.LockOnEvent = teleport.LockOnEvent;
+        //         // teleportComponent.SoundOnTeleport = teleport.TeleportSoundId;
+        //
+        //         // if (teleport.PlayerRotationX.HasValue)
+        //         // {
+        //         //     teleportComponent.OverridePlayerXRotation = true;
+        //         //     teleportComponent.PlayerRotationX = teleport.PlayerRotationX.Value;
+        //         // }
+        //         //
+        //         // if (teleport.PlayerRotationY.HasValue)
+        //         // {
+        //         //     teleportComponent.OverridePlayerYRotation = true;
+        //         //     teleportComponent.PlayerRotationY = teleport.PlayerRotationY.Value;
+        //         // }
+        //     }
+        //
+        //     _objectFromId.Add(teleport.ObjectId, gameObject.transform);
+        // }
+
+        // foreach (TeleportComponent teleport in _rootTransform.GetComponentsInChildren<TeleportComponent>())
+        // {
+        //     foreach (TargetTeleporter targetTeleporter in teleport.TargetTeleporters)
+        //     {
+        //         targetTeleporter.Teleporter = _objectFromId[targetTeleporter.Id].GetComponent<TeleportComponent>();
+        //     }
+        // }
     }
 
     private static void AddRigidbodies()
