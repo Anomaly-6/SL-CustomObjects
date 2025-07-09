@@ -10,440 +10,472 @@ using Object = UnityEngine.Object;
 
 public static class Decompiler
 {
-    [MenuItem("SchematicManager/Import Schematic")]
-    private static void PortBack()
-    {
-        string inportPath = SchematicManager.Config.ExportPath;
-        if (!Directory.Exists(inportPath))
-            Directory.CreateDirectory(inportPath);
+	[MenuItem("SchematicManager/Import Schematic")]
+	private static void PortBack()
+	{
+		string inportPath = SchematicManager.Config.ExportPath;
+		if (!Directory.Exists(inportPath))
+			Directory.CreateDirectory(inportPath);
 
-        _schematicDirectoryPath = EditorUtility.OpenFolderPanel("Select folder with the schematic", inportPath, "");
-        if (string.IsNullOrEmpty(_schematicDirectoryPath))
-        {
-            Debug.LogError("Invalid schematic directory. Path is empty.");
-            return;
-        }
+		_schematicDirectoryPath = EditorUtility.OpenFolderPanel("Select folder with the schematic", inportPath, "");
+		if (string.IsNullOrEmpty(_schematicDirectoryPath))
+		{
+			Debug.LogError("Invalid schematic directory. Path is empty.");
+			return;
+		}
 
-        _schematicName = Path.GetFileName(_schematicDirectoryPath);
-        string jsonFilePath = Path.Combine(_schematicDirectoryPath, $"{_schematicName}.json");
-        if (!File.Exists(jsonFilePath))
-        {
-            Debug.LogError("No json file found in the schematic directory!");
-            return;
-        }
+		_schematicName = Path.GetFileName(_schematicDirectoryPath);
+		string jsonFilePath = Path.Combine(_schematicDirectoryPath, $"{_schematicName}.json");
+		if (!File.Exists(jsonFilePath))
+		{
+			Debug.LogError("No json file found in the schematic directory!");
+			return;
+		}
 
-        _blockPrefabs = Resources.LoadAll<GameObject>("Blocks").ToList();
-        _schematicData = JsonConvert.DeserializeObject<SchematicObjectDataList>(File.ReadAllText(jsonFilePath));
+		_blockPrefabs = Resources.LoadAll<GameObject>("Blocks").ToList();
+		_schematicData = JsonConvert.DeserializeObject<SchematicObjectDataList>(File.ReadAllText(jsonFilePath));
 
-        _rootTransform = new GameObject(_schematicName).AddComponent<Schematic>().transform;
-        _objectFromId = new Dictionary<int, Transform>(_schematicData.Blocks.Count + 1)
-        {
-            { _schematicData.RootObjectId, _rootTransform },
-        };
+		_rootTransform = new GameObject(_schematicName).AddComponent<Schematic>().transform;
+		_objectFromId = new Dictionary<int, Transform>(_schematicData.Blocks.Count + 1)
+		{
+			{ _schematicData.RootObjectId, _rootTransform },
+		};
 
-        System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        Debug.Log("<color=#FFFF00>Importing schematic...</color>");
-        
-        CreateRecursiveFromID(_schematicData.RootObjectId, _schematicData.Blocks, _rootTransform);
-        CreateTeleporters(_schematicData.Blocks);
-        AddRigidbodies();
+		System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+		Debug.Log("<color=#FFFF00>Importing schematic...</color>");
 
-        Debug.Log($"<color=#00FF00>Successfully imported <b>{_schematicName}</b> schematic in {stopwatch.ElapsedMilliseconds} ms!</color>");
-        NullifyFields();
-    }
+		CreateRecursiveFromID(_schematicData.RootObjectId, _schematicData.Blocks, _rootTransform);
+		CreateTeleporters(_schematicData.Blocks);
+		AddRigidbodies();
 
-    private static void CreateRecursiveFromID(int id, List<SchematicBlockData> blocks, Transform parentGameObject)
-    {
-        Transform childGameObjectTransform = CreateObject(blocks.Find(c => c.ObjectId == id), parentGameObject) ?? _rootTransform; // Create the object first before creating children.
-        int[] parentSchematics = blocks.Where(bl => bl.BlockType == BlockType.Schematic).Select(bl => bl.ObjectId).ToArray();
+		Debug.Log(
+			$"<color=#00FF00>Successfully imported <b>{_schematicName}</b> schematic in {stopwatch.ElapsedMilliseconds} ms!</color>");
+		NullifyFields();
+	}
 
-        // Gets all the ObjectIds of all the schematic blocks inside "blocks" argument.
-        foreach (SchematicBlockData block in blocks.FindAll(c => c.ParentId == id))
-        {
-            if (parentSchematics.Contains(block.ParentId)) // The block is a child of some schematic inside "parentSchematics" array, therefore it will be skipped to avoid spawning it and its children twice.
-                continue;
+	private static void CreateRecursiveFromID(int id, List<SchematicBlockData> blocks, Transform parentGameObject)
+	{
+		Transform childGameObjectTransform =
+			CreateObject(blocks.Find(c => c.ObjectId == id), parentGameObject) ??
+			_rootTransform; // Create the object first before creating children.
+		int[] parentSchematics =
+			blocks.Where(bl => bl.BlockType == BlockType.Schematic).Select(bl => bl.ObjectId).ToArray();
 
-            CreateRecursiveFromID(block.ObjectId, blocks, childGameObjectTransform); // The child now becomes the parent
-        }
-    }
+		// Gets all the ObjectIds of all the schematic blocks inside "blocks" argument.
+		foreach (SchematicBlockData block in blocks.FindAll(c => c.ParentId == id))
+		{
+			if (parentSchematics.Contains(block
+				    .ParentId)) // The block is a child of some schematic inside "parentSchematics" array, therefore it will be skipped to avoid spawning it and its children twice.
+				continue;
 
-    private static Transform CreateObject(SchematicBlockData block, Transform rootObject)
-    {
-        if (block == null)
-            return null;
+			CreateRecursiveFromID(block.ObjectId, blocks, childGameObjectTransform); // The child now becomes the parent
+		}
+	}
 
-        GameObject gameObject = null;
-        RuntimeAnimatorController animatorController;
-        SerializableRigidbody serializableRigidbody;
-        
-        switch (block.BlockType)
-        {
-            case BlockType.Empty:
-                {
-                    gameObject = new GameObject(block.Name);
-                    gameObject.transform.parent = rootObject;
-                    gameObject.transform.localPosition = block.Position;
+	private static Transform CreateObject(SchematicBlockData block, Transform rootObject)
+	{
+		if (block == null)
+			return null;
 
-                    _objectFromId.Add(block.ObjectId, gameObject.transform);
+		GameObject gameObject = null;
+		RuntimeAnimatorController animatorController;
+		SerializableRigidbody serializableRigidbody;
 
-                    break;
-                }
+		switch (block.BlockType)
+		{
+			case BlockType.Empty:
+			{
+				gameObject = new GameObject(block.Name);
+				gameObject.transform.parent = rootObject;
+				gameObject.transform.localPosition = block.Position;
 
-            case BlockType.Primitive:
-                {
-                    object primtype = Enum.Parse(typeof(PrimitiveType), block.Properties["PrimitiveType"].ToString());
-                    GameObject primBase = _blockPrefabs.FirstOrDefault(s => s.name == primtype.ToString());
-                    gameObject = Object.Instantiate(primBase, rootObject);
-                    gameObject.name = block.Name;
-                    gameObject.transform.localPosition = block.Position;
-                    gameObject.transform.localEulerAngles = block.Rotation;
-                    gameObject.transform.localScale = new Vector3(Mathf.Abs(block.Scale.x), Mathf.Abs(block.Scale.y), Mathf.Abs(block.Scale.z));
+				_objectFromId.Add(block.ObjectId, gameObject.transform);
 
-                    if (gameObject.TryGetComponent(out PrimitiveComponent primitiveComponent))
-                    {
-                        if (block.Properties != null)
-                        {
-                            if (ColorUtility.TryParseHtmlString("#" + block.Properties["Color"], out Color color))
-                            {
-                                primitiveComponent.Color = color;
-                                Renderer _renderer = gameObject.GetComponent<Renderer>();
-                                Material shared = color.a >= 1f ? new Material((Material)Resources.Load("Materials/Regular")) : new Material((Material)Resources.Load("Materials/Transparent"));
-                                _renderer.sharedMaterial = shared;
-                                _renderer.sharedMaterial.color = color;
-                            }
-                            else
-                            {
-                                Debug.LogWarning($"Couldn't parse {block.Properties["Color"]} as unity color");
-                            }
+				break;
+			}
 
-                            if (block.Properties.TryGetValue("PrimitiveFlags", out object value))
-                            {
-                                PrimitiveFlags primitiveFlags = Enum.Parse<PrimitiveFlags>(value.ToString());
-                                primitiveComponent.Collidable = primitiveFlags.HasFlag(PrimitiveFlags.Collidable);
-                                primitiveComponent.Visible = primitiveFlags.HasFlag(PrimitiveFlags.Visible);
-                            }
-                            else
-                            {
-                                // Backward compatibility
-                                primitiveComponent.Collidable = block.Scale.x >= 0f;
-                                primitiveComponent.Visible = true;
-                            }
-                        }
+			case BlockType.Primitive:
+			{
+				object primtype = Enum.Parse(typeof(PrimitiveType), block.Properties["PrimitiveType"].ToString());
+				GameObject primBase = _blockPrefabs.FirstOrDefault(s => s.name == primtype.ToString());
+				gameObject = Object.Instantiate(primBase, rootObject);
+				gameObject.name = block.Name;
+				gameObject.transform.localPosition = block.Position;
+				gameObject.transform.localEulerAngles = block.Rotation;
+				gameObject.transform.localScale = new Vector3(Mathf.Abs(block.Scale.x), Mathf.Abs(block.Scale.y),
+					Mathf.Abs(block.Scale.z));
 
-                        _objectFromId.Add(block.ObjectId, gameObject.transform);
-                    }
+				if (gameObject.TryGetComponent(out PrimitiveComponent primitiveComponent))
+				{
+					if (block.Properties != null)
+					{
+						if (ColorUtility.TryParseHtmlString("#" + block.Properties["Color"], out Color color))
+						{
+							primitiveComponent.Color = color;
+							Renderer _renderer = gameObject.GetComponent<Renderer>();
+							Material shared = color.a >= 1f
+								? new Material((Material)Resources.Load("Materials/Regular"))
+								: new Material((Material)Resources.Load("Materials/Transparent"));
+							_renderer.sharedMaterial = shared;
+							_renderer.sharedMaterial.color = color;
+						}
+						else
+						{
+							Debug.LogWarning($"Couldn't parse {block.Properties["Color"]} as unity color");
+						}
 
-                    break;
-                }
+						if (block.Properties.TryGetValue("PrimitiveFlags", out object value))
+						{
+							PrimitiveFlags primitiveFlags = Enum.Parse<PrimitiveFlags>(value.ToString());
+							primitiveComponent.Collidable = primitiveFlags.HasFlag(PrimitiveFlags.Collidable);
+							primitiveComponent.Visible = primitiveFlags.HasFlag(PrimitiveFlags.Visible);
+						}
+						else
+						{
+							// Backward compatibility
+							primitiveComponent.Collidable = block.Scale.x >= 0f;
+							primitiveComponent.Visible = true;
+						}
+					}
 
-            case BlockType.Light:
-                {
-                    GameObject baseObject = _blockPrefabs.FirstOrDefault(s => s.name == "LightSource");
-                    gameObject = Object.Instantiate(baseObject, rootObject);
-                    gameObject.name = block.Name;
-                    gameObject.transform.localPosition = block.Position;
+					_objectFromId.Add(block.ObjectId, gameObject.transform);
+				}
 
-                    if (gameObject.TryGetComponent(out Light lightComponent))
-                    {
-                        bool canParse =
-                            ColorUtility.TryParseHtmlString("#" + block.Properties["Color"].ToString(), out Color color);
-                        if (canParse)
-                        {
-                            lightComponent.color = color;
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"Couldn't parse {block.Properties["Color"]} as unity color");
-                        }
+				break;
+			}
 
-                        if (block.Properties != null)
-                        {
-                            lightComponent.intensity = float.Parse(block.Properties["Intensity"].ToString());
-                            lightComponent.range = float.Parse(block.Properties["Range"].ToString());
-                            if (block.Properties.TryGetValue("Shadows", out var property))
-                            {
-                                lightComponent.shadows = bool.Parse(property.ToString())
-                                    ? LightShadows.Soft
-                                    : LightShadows.None;
-                            }
-                        }
+			case BlockType.Light:
+			{
+				GameObject baseObject = _blockPrefabs.FirstOrDefault(s => s.name == "LightSource");
+				gameObject = Object.Instantiate(baseObject, rootObject);
+				gameObject.name = block.Name;
+				gameObject.transform.localPosition = block.Position;
 
-                        _objectFromId.Add(block.ObjectId, gameObject.transform);
-                    }
+				if (gameObject.TryGetComponent(out Light lightComponent))
+				{
+					bool canParse =
+						ColorUtility.TryParseHtmlString("#" + block.Properties["Color"].ToString(), out Color color);
+					if (canParse)
+					{
+						lightComponent.color = color;
+					}
+					else
+					{
+						Debug.LogWarning($"Couldn't parse {block.Properties["Color"]} as unity color");
+					}
 
-                    return gameObject.transform;
-                }
+					if (block.Properties != null)
+					{
+						lightComponent.intensity = float.Parse(block.Properties["Intensity"].ToString());
+						lightComponent.range = float.Parse(block.Properties["Range"].ToString());
+						if (block.Properties.TryGetValue("Shadows", out object shadowsValue))
+						{
+							// Backward compatibility
+							lightComponent.shadows = (bool)shadowsValue ? LightShadows.Soft : LightShadows.None;
+						}
+						else
+						{
+							lightComponent.shape = Enum.Parse<LightShape>(block.Properties["Shape"].ToString());
+							lightComponent.spotAngle = float.Parse(block.Properties["SpotAngle"].ToString());
+							lightComponent.innerSpotAngle = float.Parse(block.Properties["InnerSpotAngle"].ToString());
+							lightComponent.shadowStrength = float.Parse(block.Properties["ShadowStrength"].ToString());
+							lightComponent.shadows =
+								Enum.Parse<LightShadows>(block.Properties["ShadowStrength"].ToString());
+						}
+					}
 
-            case BlockType.Pickup:
-                {
-                    GameObject basePickup = _blockPrefabs.FirstOrDefault(s => s.name == "Pickup");
-                    gameObject = Object.Instantiate(basePickup, rootObject);
-                    gameObject.name = block.Name;
-                    gameObject.transform.localPosition = block.Position;
-                    gameObject.transform.localEulerAngles = block.Rotation;
-                    gameObject.transform.localScale = block.Scale;
+					_objectFromId.Add(block.ObjectId, gameObject.transform);
+				}
 
-                    if (gameObject.TryGetComponent(out PickupComponent pickupComponent) && block.Properties != null)
-                    {
-                        pickupComponent.ItemType = (ItemType)Enum.Parse(typeof(ItemType), block.Properties["ItemType"].ToString());
-                        pickupComponent.CanBePickedUp = !block.Properties.ContainsKey("Locked");
-                        pickupComponent.Chance = float.Parse(block.Properties["Chance"].ToString());
-                    }
+				return gameObject.transform;
+			}
 
-                    _objectFromId.Add(block.ObjectId, gameObject.transform);
+			case BlockType.Pickup:
+			{
+				GameObject basePickup = _blockPrefabs.FirstOrDefault(s => s.name == "Pickup");
+				gameObject = Object.Instantiate(basePickup, rootObject);
+				gameObject.name = block.Name;
+				gameObject.transform.localPosition = block.Position;
+				gameObject.transform.localEulerAngles = block.Rotation;
+				gameObject.transform.localScale = block.Scale;
 
-                    return gameObject.transform;
-                }
+				if (gameObject.TryGetComponent(out PickupComponent pickupComponent) && block.Properties != null)
+				{
+					pickupComponent.ItemType =
+						(ItemType)Enum.Parse(typeof(ItemType), block.Properties["ItemType"].ToString());
+					pickupComponent.CanBePickedUp = !block.Properties.ContainsKey("Locked");
+					pickupComponent.Chance = float.Parse(block.Properties["Chance"].ToString());
+				}
 
-            case BlockType.Workstation:
-                {
-                    GameObject workstationBase = _blockPrefabs.FirstOrDefault(s => s.name == "Workstation");
-                    gameObject = Object.Instantiate(workstationBase, rootObject);
-                    gameObject.name = block.Name;
-                    gameObject.transform.localPosition = block.Position;
-                    gameObject.transform.localEulerAngles = block.Rotation;
-                    gameObject.transform.localScale = block.Scale;
+				_objectFromId.Add(block.ObjectId, gameObject.transform);
 
-                    if (gameObject.TryGetComponent(out WorkstationComponent workstationComponent) && block.Properties != null)
-                        workstationComponent.IsInteractable = bool.Parse(block.Properties["IsInteractable"].ToString());
+				return gameObject.transform;
+			}
 
-                    _objectFromId.Add(block.ObjectId, gameObject.transform);
+			case BlockType.Workstation:
+			{
+				GameObject workstationBase = _blockPrefabs.FirstOrDefault(s => s.name == "Workstation");
+				gameObject = Object.Instantiate(workstationBase, rootObject);
+				gameObject.name = block.Name;
+				gameObject.transform.localPosition = block.Position;
+				gameObject.transform.localEulerAngles = block.Rotation;
+				gameObject.transform.localScale = block.Scale;
 
-                    return gameObject.transform;
-                }
+				if (gameObject.TryGetComponent(out WorkstationComponent workstationComponent) &&
+				    block.Properties != null)
+					workstationComponent.IsInteractable = bool.Parse(block.Properties["IsInteractable"].ToString());
 
-            case BlockType.Locker:
-            {
-                object lockerType =  Enum.Parse(typeof(LockerType), block.Properties["LockerType"].ToString());
-                GameObject lockerBase = _blockPrefabs.FirstOrDefault(s => s.name.Contains(lockerType.ToString()));
-                gameObject = Object.Instantiate(lockerBase, rootObject);
-                gameObject.name = block.Name;
-                gameObject.transform.localPosition = block.Position;
-                gameObject.transform.localEulerAngles = block.Rotation;
-                gameObject.transform.localScale = block.Scale;
-                
-                if (gameObject.TryGetComponent(out LockerComponent lockerComponent) && block.Properties != null)
-                {
-                    Dictionary<int, List<SerializableLockerItem>> dict = JsonConvert.DeserializeObject<Dictionary<int, List<SerializableLockerItem>>>(JsonConvert.SerializeObject(block.Properties["Chambers"]));
-                    lockerComponent.Chambers = new LockerChamber[lockerComponent.Chambers.Length];
-                    
-                    for (int i = 0; i < dict.Count; i++)
-                    {
-                        List<LockerItem> possibleItems = dict[i].Select(item => new LockerItem(item)).ToList();
+				_objectFromId.Add(block.ObjectId, gameObject.transform);
 
-                        LockerChamber lockerChamber = new LockerChamber
-                        {
-                            PossibleItems = possibleItems
-                        };
-                        lockerComponent.Chambers[i] = lockerChamber;
-                    }
+				return gameObject.transform;
+			}
 
-                    lockerComponent.AllowedRoleTypes = JsonConvert.DeserializeObject<List<string>>(JsonConvert.SerializeObject(block.Properties["AllowedRoleTypes"])).ToArray();
-                    lockerComponent.ShuffleChambers = bool.Parse(block.Properties["ShuffleChambers"].ToString());
-                    lockerComponent.KeycardPermissions = (KeycardPermissions)Enum.Parse(typeof(KeycardPermissions), block.Properties["KeycardPermissions"].ToString());
-                    lockerComponent.OpenedChambers = ushort.Parse(block.Properties["OpenedChambers"].ToString());
-                    lockerComponent.InteractLock = bool.Parse(block.Properties["InteractLock"].ToString());
-                    lockerComponent.Chance = float.Parse(block.Properties["Chance"].ToString());
-                }
-                
-                return gameObject.transform;
-            }
-            case BlockType.Door:
-            {
-                foreach (GameObject blockPrefab in _blockPrefabs)
-                {
-                    if (!blockPrefab.TryGetComponent(out DoorComponent doorComponent)) continue;
-                    if (doorComponent.DoorType != (DoorType)Convert.ToInt32(block.Properties["DoorType"])) continue;
-                    var door = Object.Instantiate(doorComponent, rootObject);
-                    gameObject = door.gameObject;
-                    door.name = block.Name;
-                    door.transform.localPosition = block.Position;
-                    door.transform.localEulerAngles = block.Rotation;
-                    door.transform.localScale = block.Scale;
-                    door.IsOpen = (bool)block.Properties["IsOpen"];
-                    door.IsLocked = (bool)block.Properties["IsLocked"];
-                    door.RequiredPermissions = (DoorPermissionFlags)Convert.ToUInt16(block.Properties["RequiredPermissions"]);
-                    door.RequireAll = (bool)block.Properties["RequireAll"];
-                    return gameObject.transform;
-                }
-                break;
-            }
-            case BlockType.Teleport:
-            {
-                foreach (GameObject blockPrefab in _blockPrefabs)
-                {
-                    if (!blockPrefab.TryGetComponent(out TeleportComponent teleportComponent)) continue;
-                    var teleport = Object.Instantiate(teleportComponent, rootObject);
-                    gameObject = teleport.gameObject;
-                    teleport.name = block.Name;
-                    teleport.transform.localPosition = block.Position;
-                    teleport.transform.localEulerAngles = block.Rotation;
-                    teleport.transform.localScale = block.Scale;
-                    teleport.Cooldown = Convert.ToSingle(block.Properties["Cooldown"]);
-                }
-                break;
-            }
-            case BlockType.Interactable:
-            {
-                foreach (GameObject blockPrefab in _blockPrefabs)
-                {
-                    if (!blockPrefab.TryGetComponent(out InteractableComponent interactableComponent)) continue;
-                    var interactable = Object.Instantiate(interactableComponent, rootObject);
-                    gameObject = interactable.gameObject;
-                    interactable.name = block.Name;
-                    interactable.transform.localPosition = block.Position;
-                    interactable.transform.localEulerAngles = block.Rotation;
-                    interactable.transform.localScale = block.Scale;
-                    interactable.ColliderShape = (ColliderShape)Enum.Parse(typeof(ColliderShape), block.Properties["Shape"].ToString());
-                    interactable.InteractionDuration = Convert.ToSingle(block.Properties["InteractionDuration"]);
-                    interactable.IsLocked = (bool)block.Properties["IsLocked"];
-                    interactable.Init();
-                }
-                break;
-            }
-        }
+			case BlockType.Locker:
+			{
+				object lockerType = Enum.Parse(typeof(LockerType), block.Properties["LockerType"].ToString());
+				GameObject lockerBase = _blockPrefabs.FirstOrDefault(s => s.name.Contains(lockerType.ToString()));
+				gameObject = Object.Instantiate(lockerBase, rootObject);
+				gameObject.name = block.Name;
+				gameObject.transform.localPosition = block.Position;
+				gameObject.transform.localEulerAngles = block.Rotation;
+				gameObject.transform.localScale = block.Scale;
 
-        if (TryGetAnimatorController(block.AnimatorName, out animatorController))
-            gameObject.AddComponent<Animator>().runtimeAnimatorController = animatorController;
+				if (gameObject.TryGetComponent(out LockerComponent lockerComponent) && block.Properties != null)
+				{
+					Dictionary<int, List<SerializableLockerItem>> dict =
+						JsonConvert.DeserializeObject<Dictionary<int, List<SerializableLockerItem>>>(
+							JsonConvert.SerializeObject(block.Properties["Chambers"]));
+					lockerComponent.Chambers = new LockerChamber[lockerComponent.Chambers.Length];
 
-        return gameObject.transform;
-    }
+					for (int i = 0; i < dict.Count; i++)
+					{
+						List<LockerItem> possibleItems = dict[i].Select(item => new LockerItem(item)).ToList();
 
-    private static bool TryGetAnimatorController(string animatorName, out RuntimeAnimatorController animatorController)
-    {
-        animatorController = null;
+						LockerChamber lockerChamber = new LockerChamber
+						{
+							PossibleItems = possibleItems
+						};
+						lockerComponent.Chambers[i] = lockerChamber;
+					}
 
-        if (!string.IsNullOrEmpty(animatorName))
-        {
-            Object animatorObject = AssetBundle.GetAllLoadedAssetBundles().FirstOrDefault(x => x.mainAsset.name == animatorName)?.LoadAllAssets().First(x => x is RuntimeAnimatorController);
+					lockerComponent.AllowedRoleTypes = JsonConvert
+						.DeserializeObject<List<string>>(
+							JsonConvert.SerializeObject(block.Properties["AllowedRoleTypes"])).ToArray();
+					lockerComponent.ShuffleChambers = bool.Parse(block.Properties["ShuffleChambers"].ToString());
+					lockerComponent.KeycardPermissions = (KeycardPermissions)Enum.Parse(typeof(KeycardPermissions),
+						block.Properties["KeycardPermissions"].ToString());
+					lockerComponent.OpenedChambers = ushort.Parse(block.Properties["OpenedChambers"].ToString());
+					lockerComponent.InteractLock = bool.Parse(block.Properties["InteractLock"].ToString());
+					lockerComponent.Chance = float.Parse(block.Properties["Chance"].ToString());
+				}
 
-            if (animatorObject == null)
-            {
-                string path = Path.Combine(_schematicDirectoryPath, animatorName);
+				return gameObject.transform;
+			}
+			case BlockType.Door:
+			{
+				foreach (GameObject blockPrefab in _blockPrefabs)
+				{
+					if (!blockPrefab.TryGetComponent(out DoorComponent doorComponent)) continue;
+					if (doorComponent.DoorType != (DoorType)Convert.ToInt32(block.Properties["DoorType"])) continue;
+					var door = Object.Instantiate(doorComponent, rootObject);
+					gameObject = door.gameObject;
+					door.name = block.Name;
+					door.transform.localPosition = block.Position;
+					door.transform.localEulerAngles = block.Rotation;
+					door.transform.localScale = block.Scale;
+					door.IsOpen = (bool)block.Properties["IsOpen"];
+					door.IsLocked = (bool)block.Properties["IsLocked"];
+					door.RequiredPermissions =
+						(DoorPermissionFlags)Convert.ToUInt16(block.Properties["RequiredPermissions"]);
+					door.RequireAll = (bool)block.Properties["RequireAll"];
+					return gameObject.transform;
+				}
 
-                if (!File.Exists(path))
-                    return false;
+				break;
+			}
+			case BlockType.Teleport:
+			{
+				foreach (GameObject blockPrefab in _blockPrefabs)
+				{
+					if (!blockPrefab.TryGetComponent(out TeleportComponent teleportComponent)) continue;
+					var teleport = Object.Instantiate(teleportComponent, rootObject);
+					gameObject = teleport.gameObject;
+					teleport.name = block.Name;
+					teleport.transform.localPosition = block.Position;
+					teleport.transform.localEulerAngles = block.Rotation;
+					teleport.transform.localScale = block.Scale;
+					teleport.Cooldown = Convert.ToSingle(block.Properties["Cooldown"]);
+				}
 
-                animatorObject = AssetBundle.LoadFromFile(path).LoadAllAssets().First(x => x is RuntimeAnimatorController);
-            }
+				break;
+			}
+			case BlockType.Interactable:
+			{
+				foreach (GameObject blockPrefab in _blockPrefabs)
+				{
+					if (!blockPrefab.TryGetComponent(out InteractableComponent interactableComponent)) continue;
+					var interactable = Object.Instantiate(interactableComponent, rootObject);
+					gameObject = interactable.gameObject;
+					interactable.name = block.Name;
+					interactable.transform.localPosition = block.Position;
+					interactable.transform.localEulerAngles = block.Rotation;
+					interactable.transform.localScale = block.Scale;
+					interactable.ColliderShape =
+						(ColliderShape)Enum.Parse(typeof(ColliderShape), block.Properties["Shape"].ToString());
+					interactable.InteractionDuration = Convert.ToSingle(block.Properties["InteractionDuration"]);
+					interactable.IsLocked = (bool)block.Properties["IsLocked"];
+					interactable.Init();
+				}
 
-            animatorController = animatorObject as RuntimeAnimatorController;
-            return true;
-        }
+				break;
+			}
+		}
 
-        return false;
-    }
+		if (TryGetAnimatorController(block.AnimatorName, out animatorController))
+			gameObject.AddComponent<Animator>().runtimeAnimatorController = animatorController;
 
-    private static void CreateTeleporters(List<SchematicBlockData> blocks)
-    {
-        var teleports = GameObject.FindObjectsOfType<TeleportComponent>();
-        foreach (var block in blocks)
-        {
-            if (block.BlockType != BlockType.Teleport) continue;
-            TeleportComponent source = null;
-            foreach (var teleportComponent in teleports)
-            {
-                if (teleportComponent.name == block.Name)
-                {
-                    source = teleportComponent;
-                    break;
-                }
-            }
-            if (source == null) continue;
-            foreach (var target in ((JArray)block.Properties["Targets"]).ToObject<List<string>>())
-            {
-                foreach (var teleportComponent in teleports)
-                {
-                    if (teleportComponent.name == (string)target)
-                    {
-                        source.TargetTeleporters.Add(teleportComponent);
-                    }
-                }
-            }
-        }
-        
-        // string teleportPath = Path.Combine(_schematicDirectoryPath, $"{_schematicName}-Teleports.json");
-        // if (!File.Exists(teleportPath))
-        //     return;
-        //
-        // foreach (SerializableTeleport teleport in JsonConvert.DeserializeObject<List<SerializableTeleport>>(File.ReadAllText(teleportPath)))
-        // {
-        //     GameObject gameObject = Object.Instantiate(_blockPrefabs.FirstOrDefault(x => x.name == "Teleporter"));
-        //     gameObject.name = teleport.Name;
-        //     gameObject.transform.parent = _objectFromId[teleport.ParentId];
-        //     gameObject.transform.localPosition = teleport.Position;
-        //     gameObject.transform.localEulerAngles = teleport.Rotation;
-        //     gameObject.transform.localScale = teleport.Scale;
-        //
-        //     if (gameObject.TryGetComponent(out TeleportComponent teleportComponent))
-        //     {
-        //         // teleportComponent.TargetTeleporters = teleport.TargetTeleporters.ToArray();
-        //         // teleportComponent.RoomType = teleport.RoomType;
-        //         // teleportComponent.AllowedRoleTypes = teleport.AllowedRoles.ToArray();
-        //         teleportComponent.Cooldown = teleport.Cooldown;
-        //         // teleportComponent.TeleportFlags = teleport.TeleportFlags;
-        //         // teleportComponent.LockOnEvent = teleport.LockOnEvent;
-        //         // teleportComponent.SoundOnTeleport = teleport.TeleportSoundId;
-        //
-        //         // if (teleport.PlayerRotationX.HasValue)
-        //         // {
-        //         //     teleportComponent.OverridePlayerXRotation = true;
-        //         //     teleportComponent.PlayerRotationX = teleport.PlayerRotationX.Value;
-        //         // }
-        //         //
-        //         // if (teleport.PlayerRotationY.HasValue)
-        //         // {
-        //         //     teleportComponent.OverridePlayerYRotation = true;
-        //         //     teleportComponent.PlayerRotationY = teleport.PlayerRotationY.Value;
-        //         // }
-        //     }
-        //
-        //     _objectFromId.Add(teleport.ObjectId, gameObject.transform);
-        // }
+		return gameObject.transform;
+	}
 
-        // foreach (TeleportComponent teleport in _rootTransform.GetComponentsInChildren<TeleportComponent>())
-        // {
-        //     foreach (TargetTeleporter targetTeleporter in teleport.TargetTeleporters)
-        //     {
-        //         targetTeleporter.Teleporter = _objectFromId[targetTeleporter.Id].GetComponent<TeleportComponent>();
-        //     }
-        // }
-    }
+	private static bool TryGetAnimatorController(string animatorName, out RuntimeAnimatorController animatorController)
+	{
+		animatorController = null;
 
-    private static void AddRigidbodies()
-    {
-        string rigidbodyPath = Path.Combine(_schematicDirectoryPath, $"{_schematicName}-Rigidbodies.json");
-        if (!File.Exists(rigidbodyPath))
-            return;
+		if (!string.IsNullOrEmpty(animatorName))
+		{
+			Object animatorObject = AssetBundle.GetAllLoadedAssetBundles()
+				.FirstOrDefault(x => x.mainAsset.name == animatorName)?.LoadAllAssets()
+				.First(x => x is RuntimeAnimatorController);
 
-        foreach (KeyValuePair<int, SerializableRigidbody> dict in JsonConvert.DeserializeObject<Dictionary<int, SerializableRigidbody>>(File.ReadAllText(rigidbodyPath)))
-        {
-            if (!_objectFromId[dict.Key].gameObject.TryGetComponent(out Rigidbody rigidbody))
-                rigidbody = _objectFromId[dict.Key].gameObject.AddComponent<Rigidbody>();
+			if (animatorObject == null)
+			{
+				string path = Path.Combine(_schematicDirectoryPath, animatorName);
 
-            rigidbody.isKinematic = dict.Value.IsKinematic;
-            rigidbody.useGravity = dict.Value.UseGravity;
-            rigidbody.constraints = dict.Value.Constraints;
-            rigidbody.mass = dict.Value.Mass;
-        }
-    }
+				if (!File.Exists(path))
+					return false;
 
-    private static void NullifyFields()
-    {
-        _blockPrefabs = null;
-        _rootTransform = null;
-        _schematicName = null;
-        _schematicDirectoryPath = null;
-        _schematicData = null;
-        _objectFromId = null;
-        AssetBundle.UnloadAllAssetBundles(false);
-    }
+				animatorObject = AssetBundle.LoadFromFile(path).LoadAllAssets()
+					.First(x => x is RuntimeAnimatorController);
+			}
 
-    private static List<GameObject> _blockPrefabs;
-    private static Transform _rootTransform;
-    private static string _schematicName;
-    private static string _schematicDirectoryPath;
-    private static SchematicObjectDataList _schematicData;
-    private static Dictionary<int, Transform> _objectFromId;
+			animatorController = animatorObject as RuntimeAnimatorController;
+			return true;
+		}
+
+		return false;
+	}
+
+	private static void CreateTeleporters(List<SchematicBlockData> blocks)
+	{
+		var teleports = GameObject.FindObjectsOfType<TeleportComponent>();
+		foreach (var block in blocks)
+		{
+			if (block.BlockType != BlockType.Teleport) continue;
+			TeleportComponent source = null;
+			foreach (var teleportComponent in teleports)
+			{
+				if (teleportComponent.name == block.Name)
+				{
+					source = teleportComponent;
+					break;
+				}
+			}
+
+			if (source == null) continue;
+			foreach (var target in ((JArray)block.Properties["Targets"]).ToObject<List<string>>())
+			{
+				foreach (var teleportComponent in teleports)
+				{
+					if (teleportComponent.name == (string)target)
+					{
+						source.TargetTeleporters.Add(teleportComponent);
+					}
+				}
+			}
+		}
+
+		// string teleportPath = Path.Combine(_schematicDirectoryPath, $"{_schematicName}-Teleports.json");
+		// if (!File.Exists(teleportPath))
+		//     return;
+		//
+		// foreach (SerializableTeleport teleport in JsonConvert.DeserializeObject<List<SerializableTeleport>>(File.ReadAllText(teleportPath)))
+		// {
+		//     GameObject gameObject = Object.Instantiate(_blockPrefabs.FirstOrDefault(x => x.name == "Teleporter"));
+		//     gameObject.name = teleport.Name;
+		//     gameObject.transform.parent = _objectFromId[teleport.ParentId];
+		//     gameObject.transform.localPosition = teleport.Position;
+		//     gameObject.transform.localEulerAngles = teleport.Rotation;
+		//     gameObject.transform.localScale = teleport.Scale;
+		//
+		//     if (gameObject.TryGetComponent(out TeleportComponent teleportComponent))
+		//     {
+		//         // teleportComponent.TargetTeleporters = teleport.TargetTeleporters.ToArray();
+		//         // teleportComponent.RoomType = teleport.RoomType;
+		//         // teleportComponent.AllowedRoleTypes = teleport.AllowedRoles.ToArray();
+		//         teleportComponent.Cooldown = teleport.Cooldown;
+		//         // teleportComponent.TeleportFlags = teleport.TeleportFlags;
+		//         // teleportComponent.LockOnEvent = teleport.LockOnEvent;
+		//         // teleportComponent.SoundOnTeleport = teleport.TeleportSoundId;
+		//
+		//         // if (teleport.PlayerRotationX.HasValue)
+		//         // {
+		//         //     teleportComponent.OverridePlayerXRotation = true;
+		//         //     teleportComponent.PlayerRotationX = teleport.PlayerRotationX.Value;
+		//         // }
+		//         //
+		//         // if (teleport.PlayerRotationY.HasValue)
+		//         // {
+		//         //     teleportComponent.OverridePlayerYRotation = true;
+		//         //     teleportComponent.PlayerRotationY = teleport.PlayerRotationY.Value;
+		//         // }
+		//     }
+		//
+		//     _objectFromId.Add(teleport.ObjectId, gameObject.transform);
+		// }
+
+		// foreach (TeleportComponent teleport in _rootTransform.GetComponentsInChildren<TeleportComponent>())
+		// {
+		//     foreach (TargetTeleporter targetTeleporter in teleport.TargetTeleporters)
+		//     {
+		//         targetTeleporter.Teleporter = _objectFromId[targetTeleporter.Id].GetComponent<TeleportComponent>();
+		//     }
+		// }
+	}
+
+	private static void AddRigidbodies()
+	{
+		string rigidbodyPath = Path.Combine(_schematicDirectoryPath, $"{_schematicName}-Rigidbodies.json");
+		if (!File.Exists(rigidbodyPath))
+			return;
+
+		foreach (KeyValuePair<int, SerializableRigidbody> dict in JsonConvert
+			         .DeserializeObject<Dictionary<int, SerializableRigidbody>>(File.ReadAllText(rigidbodyPath)))
+		{
+			if (!_objectFromId[dict.Key].gameObject.TryGetComponent(out Rigidbody rigidbody))
+				rigidbody = _objectFromId[dict.Key].gameObject.AddComponent<Rigidbody>();
+
+			rigidbody.isKinematic = dict.Value.IsKinematic;
+			rigidbody.useGravity = dict.Value.UseGravity;
+			rigidbody.constraints = dict.Value.Constraints;
+			rigidbody.mass = dict.Value.Mass;
+		}
+	}
+
+	private static void NullifyFields()
+	{
+		_blockPrefabs = null;
+		_rootTransform = null;
+		_schematicName = null;
+		_schematicDirectoryPath = null;
+		_schematicData = null;
+		_objectFromId = null;
+		AssetBundle.UnloadAllAssetBundles(false);
+	}
+
+	private static List<GameObject> _blockPrefabs;
+	private static Transform _rootTransform;
+	private static string _schematicName;
+	private static string _schematicDirectoryPath;
+	private static SchematicObjectDataList _schematicData;
+	private static Dictionary<int, Transform> _objectFromId;
 }
-

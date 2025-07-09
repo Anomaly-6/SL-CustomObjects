@@ -70,6 +70,19 @@ public class Schematic : SchematicBlock
             {
                 if (!schematicBlock.Compile(block, this))
                     continue;
+                foreach (var blockData in BlockList.Blocks)
+                {
+                    if (block.BlockType is not BlockType.Door and not BlockType.Teleport) continue;
+                    if (blockData.Name != block.Name) continue;
+                    string errorMsg = $"Найдено несколько блоков с именем «{blockData.Name}»! Переименуйте их, чтобы каждый имел уникальное имя.";
+                    EditorUtility.DisplayDialog(
+                        "Ошибка компиляции схемы",
+                        errorMsg,
+                        "ОК"
+                    );
+                    Debug.LogError(errorMsg);
+                    return;
+                }
             }
             else
             {
