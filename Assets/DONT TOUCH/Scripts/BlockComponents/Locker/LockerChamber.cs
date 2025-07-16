@@ -3,5 +3,7 @@
 [System.Serializable]
 public class LockerChamber
 {
-    public List<LockerItem> PossibleItems = new List<LockerItem>();
+    public List<ItemType> AcceptableItems;
+    public bool IsOpen;
+    public DoorPermissionFlags RequiredPermissions;
 }

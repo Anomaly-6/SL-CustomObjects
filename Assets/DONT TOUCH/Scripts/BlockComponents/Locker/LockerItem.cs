@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -11,30 +10,29 @@ public class LockerItem
 
     public LockerItem(SerializableLockerItem serializableLockerItem)
     {
-        if (Enum.TryParse(serializableLockerItem.Item, out ItemType itemType))
+        if (Enum.TryParse(serializableLockerItem.TargetItem, out ItemType itemType))
         {
-            ItemType = itemType;
-        }
-        else
-        {
-            CustomItem = serializableLockerItem.Item;
+            TargetItem = itemType;
         }
         
-        Count = serializableLockerItem.Count;
-        Attachments = serializableLockerItem.Attachments;
-        Chance = serializableLockerItem.Chance;
+        RemainingUses = serializableLockerItem.RemainingUses;
+        ProbabilityPoints = serializableLockerItem.ProbabilityPoints;
+        MinPerChamber = serializableLockerItem.MinPerChamber;
+        MaxPerChamber = serializableLockerItem.MaxPerChamber;
     }
     
     [Tooltip("The ItemType of this pickup.")]
-    public ItemType ItemType;
+    public ItemType TargetItem;
 
-    // [Label("Custom Item name/ID")]
-    public string CustomItem;
+    [Min(0)]
+    public int RemainingUses = 1;
+    
+    [Min(0)]
+    public int ProbabilityPoints = 100;
 
-    public uint Count = 1;
-
-    // [ReorderableList]
-    public List<AttachmentName> Attachments = new List<AttachmentName>();
-
-    public float Chance = 100;
+    [Min(0)]
+    public int MinPerChamber = 1;
+    
+    [Min(0)]
+    public int MaxPerChamber = 10;
 }

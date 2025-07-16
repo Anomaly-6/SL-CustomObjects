@@ -242,31 +242,14 @@ public static class Decompiler
 
 				if (gameObject.TryGetComponent(out LockerComponent lockerComponent) && block.Properties != null)
 				{
-					Dictionary<int, List<SerializableLockerItem>> dict =
-						JsonConvert.DeserializeObject<Dictionary<int, List<SerializableLockerItem>>>(
-							JsonConvert.SerializeObject(block.Properties["Chambers"]));
-					lockerComponent.Chambers = new LockerChamber[lockerComponent.Chambers.Length];
-
-					for (int i = 0; i < dict.Count; i++)
+					foreach (var chamber in (List<object>)block.Properties["Chambers"])
 					{
-						List<LockerItem> possibleItems = dict[i].Select(item => new LockerItem(item)).ToList();
-
-						LockerChamber lockerChamber = new LockerChamber
-						{
-							PossibleItems = possibleItems
-						};
-						lockerComponent.Chambers[i] = lockerChamber;
+						lockerComponent.Chambers.Add(JsonConvert.DeserializeObject<LockerChamber>(Convert.ToString(chamber)));
 					}
-
-					lockerComponent.AllowedRoleTypes = JsonConvert
-						.DeserializeObject<List<string>>(
-							JsonConvert.SerializeObject(block.Properties["AllowedRoleTypes"])).ToArray();
-					lockerComponent.ShuffleChambers = bool.Parse(block.Properties["ShuffleChambers"].ToString());
-					lockerComponent.KeycardPermissions = (KeycardPermissions)Enum.Parse(typeof(KeycardPermissions),
-						block.Properties["KeycardPermissions"].ToString());
-					lockerComponent.OpenedChambers = ushort.Parse(block.Properties["OpenedChambers"].ToString());
-					lockerComponent.InteractLock = bool.Parse(block.Properties["InteractLock"].ToString());
-					lockerComponent.Chance = float.Parse(block.Properties["Chance"].ToString());
+					foreach (var loot in (List<object>)block.Properties["Loot"])
+					{
+						lockerComponent.Chambers.Add(JsonConvert.DeserializeObject<LockerChamber>(Convert.ToString(loot)));
+					}
 				}
 
 				return gameObject.transform;
@@ -325,6 +308,89 @@ public static class Decompiler
 					interactable.InteractionDuration = Convert.ToSingle(block.Properties["InteractionDuration"]);
 					interactable.IsLocked = (bool)block.Properties["IsLocked"];
 					interactable.Init();
+				}
+
+				break;
+			}
+			case BlockType.Text:
+			{
+				foreach (GameObject blockPrefab in _blockPrefabs)
+				{
+					if (!blockPrefab.TryGetComponent(out TextComponent textComponent)) continue;
+					var instantiate = Object.Instantiate(textComponent, rootObject);
+					gameObject = instantiate.gameObject;
+					instantiate.name = block.Name;
+					instantiate.transform.localPosition = block.Position;
+					instantiate.transform.localEulerAngles = block.Rotation;
+					instantiate.transform.localScale = block.Scale;
+					instantiate.Text = Convert.ToString(block.Properties["Text"]);
+				}
+
+				break;
+			}
+			case BlockType.Camera:
+			{
+				object cameraType = Enum.Parse(typeof(CameraType), block.Properties["CameraType"].ToString());
+				GameObject cameraBase = _blockPrefabs.FirstOrDefault(s => s.name.Contains(cameraType.ToString()));
+				gameObject = Object.Instantiate(cameraBase, rootObject);
+				gameObject.name = block.Name;
+				gameObject.transform.localPosition = block.Position;
+				gameObject.transform.localEulerAngles = block.Rotation;
+				gameObject.transform.localScale = block.Scale;
+
+				if (gameObject.TryGetComponent(out Scp079CameraComponent cameraComponent) && block.Properties != null)
+				{
+					cameraComponent.Label = Convert.ToString(block.Properties["Label"]);
+				}
+
+				return gameObject.transform;
+			}
+			case BlockType.ShootingTarget:
+			{
+				foreach (GameObject blockPrefab in _blockPrefabs)
+				{
+					if (!blockPrefab.TryGetComponent(out ShootingTargetComponent targetComponent)) continue;
+					if (targetComponent.TargetType != (TargetType)Convert.ToInt32(block.Properties["TargetType"])) continue;
+					var instantiate = Object.Instantiate(targetComponent, rootObject);
+					gameObject = instantiate.gameObject;
+					instantiate.name = block.Name;
+					instantiate.transform.localPosition = block.Position;
+					instantiate.transform.localEulerAngles = block.Rotation;
+					instantiate.transform.localScale = block.Scale;
+				}
+
+				break;
+			}
+			case BlockType.PlayerSpawnPoint:
+			{
+				foreach (GameObject blockPrefab in _blockPrefabs)
+				{
+					if (!blockPrefab.TryGetComponent(out PlayerSpawnPointComponent playerSpawnPointComponent)) continue;
+					var instantiate = Object.Instantiate(playerSpawnPointComponent, rootObject);
+					gameObject = instantiate.gameObject;
+					instantiate.name = block.Name;
+					instantiate.transform.localPosition = block.Position;
+					instantiate.transform.localEulerAngles = block.Rotation;
+					instantiate.transform.localScale = block.Scale;
+					foreach (var role in ((JArray)block.Properties["Roles"]).ToObject<List<RoleTypeId>>())
+					{
+						instantiate.Roles.Add(role);
+					}
+				}
+
+				break;
+			}
+			case BlockType.Capybara:
+			{
+				foreach (GameObject blockPrefab in _blockPrefabs)
+				{
+					if (!blockPrefab.TryGetComponent(out CapybaraComponent capybaraComponent)) continue;
+					var instantiate = Object.Instantiate(capybaraComponent, rootObject);
+					gameObject = instantiate.gameObject;
+					instantiate.name = block.Name;
+					instantiate.transform.localPosition = block.Position;
+					instantiate.transform.localEulerAngles = block.Rotation;
+					instantiate.transform.localScale = block.Scale;
 				}
 
 				break;

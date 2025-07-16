@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public class SerializableLockerItem
@@ -9,17 +10,24 @@ public class SerializableLockerItem
     
     public SerializableLockerItem(LockerItem lockerItem)
     {
-        Item = !string.IsNullOrEmpty(lockerItem.CustomItem) ? lockerItem.CustomItem : lockerItem.ItemType.ToString();
-        Count = lockerItem.Count;
-        Attachments = lockerItem.Attachments;
-        Chance = lockerItem.Chance;
+        TargetItem = lockerItem.TargetItem.ToString();
+        RemainingUses = lockerItem.RemainingUses;
+        ProbabilityPoints = lockerItem.ProbabilityPoints;
+        MinPerChamber = lockerItem.MinPerChamber;
+        MaxPerChamber = lockerItem.MaxPerChamber;
     }
     
-    public string Item { get; set; }
+    public string TargetItem { get; set; }
     
-    public uint Count { get; set; }
+    [Min(0)]
+    public int RemainingUses = 1;
     
-    public List<AttachmentName> Attachments { get; set; }
+    [Range(0, 100)]
+    public int ProbabilityPoints = 100;
 
-    public float Chance { get; set; }
+    [Min(0)]
+    public int MinPerChamber = 1;
+    
+    [Min(1)]
+    public int MaxPerChamber = 10;
 }

@@ -10,4 +10,9 @@
     Locker = 7,
     Door = 8,
     Interactable = 9,
+    Text = 10,
+    Camera = 11,
+    ShootingTarget = 12,
+    PlayerSpawnPoint = 13,
+    Capybara = 14,
 }

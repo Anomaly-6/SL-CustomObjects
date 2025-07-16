@@ -72,7 +72,7 @@ public class Schematic : SchematicBlock
                     continue;
                 foreach (var blockData in BlockList.Blocks)
                 {
-                    if (block.BlockType is not BlockType.Door and not BlockType.Teleport) continue;
+                    if (block.BlockType is BlockType.Primitive or BlockType.Schematic or BlockType.Empty or BlockType.Light or BlockType.Pickup) continue;
                     if (blockData.Name != block.Name) continue;
                     string errorMsg = $"Найдено несколько блоков с именем «{blockData.Name}»! Переименуйте их, чтобы каждый имел уникальное имя.";
                     EditorUtility.DisplayDialog(

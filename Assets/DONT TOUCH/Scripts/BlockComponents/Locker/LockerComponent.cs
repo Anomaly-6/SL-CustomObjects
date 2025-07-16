@@ -1,86 +1,37 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
+[ExecuteInEditMode, SelectionBase]
 public class LockerComponent : SchematicBlock
 {
-    // [ReorderableList]
-    public LockerChamber[] Chambers = new LockerChamber[] { };
-    
-    // [ReorderableList]
-    public string[] AllowedRoleTypes =
-    {
-        "Scp0492",
-        "Scp049",
-        "Scp096",
-        "Scp106",
-        "Scp173",
-        "Scp93953",
-        "Scp93989",
-        "ClassD",
-        "Scientist",
-        "FacilityGuard",
-        "NtfPrivate",
-        "NtfSergeant",
-        "NtfSpecialist",
-        "NtfCaptain",
-        "ChaosConscript",
-        "ChaosRifleman",
-        "ChaosRepressor",
-        "ChaosMarauder",
-        "Tutorial",
-    };
-    
-    public bool ShuffleChambers = true;
-    
-    public KeycardPermissions KeycardPermissions = KeycardPermissions.None;
-    
-    public ushort OpenedChambers = 0;
-    
-    [Tooltip("Locks the locker after it was interacted with.")]
-    public bool InteractLock = false;
-    
-    [Tooltip("The chance for this locker to spawn.")]
-    // [Label("Chance %")]
-    // [MinValue(0f), MaxValue(100f)]
-    public float Chance = 100f;
-    
-    [HideInInspector]
-    public LockerType LockerType;
-    
-    public override BlockType BlockType => BlockType.Locker;
+	public List<LockerChamber> Chambers = new();
+	public List<LockerItem> Loot = new();
 
-    public override bool Compile(SchematicBlockData block, Schematic _)
-    {
-        block.BlockType = BlockType.Locker;
+	public LockerType LockerType;
+	public override BlockType BlockType => BlockType.Locker;
 
-        Dictionary<int, List<SerializableLockerItem>> chambers = new Dictionary<int, List<SerializableLockerItem>>(Chambers.Length);
-        int i = 0;
+	public override bool Compile(SchematicBlockData block, Schematic _)
+	{
+		block.BlockType = BlockType.Locker;
+		List<string> jsonLoot = new(Loot.Count);
+		List<string> jsonChamber = new(Chambers.Count);
+		foreach (var chamber in Chambers)
+		{
+			jsonChamber.Add(JsonConvert.SerializeObject(chamber));
+		}
+		foreach (var loot in Loot)
+		{
+			jsonLoot.Add(JsonConvert.SerializeObject(loot));	
+		}
 
-        foreach (LockerChamber chamber in Chambers)
-        {
-            List<SerializableLockerItem> listOfItems = new List<SerializableLockerItem>(chamber.PossibleItems.Count);
+		block.Properties = new Dictionary<string, object>()
+		{
+			{ "LockerType", LockerType },	
+			{ "Chambers", jsonChamber },
+			{ "Loot", jsonLoot },
+		};
 
-            foreach (LockerItem possibleItem in chamber.PossibleItems)
-            {
-                listOfItems.Add(new SerializableLockerItem(possibleItem));
-            }
-
-            chambers.Add(i, listOfItems);
-            i++;
-        }
-
-        block.Properties = new Dictionary<string, object>
-        {
-            { "LockerType", LockerType },
-            { "Chambers", chambers },
-            { "ShuffleChambers", ShuffleChambers },
-            { "AllowedRoleTypes", AllowedRoleTypes },
-            { "KeycardPermissions", KeycardPermissions },
-            { "OpenedChambers", OpenedChambers },
-            { "InteractLock", InteractLock },
-            { "Chance", Chance },
-        };
-
-        return true;
-    }
+		return true;
+	}
 }
