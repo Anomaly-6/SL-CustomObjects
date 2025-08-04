@@ -1,36 +1,48 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 
-[ExecuteInEditMode, SelectionBase]
+[ExecuteInEditMode]
 public class TextComponent : SchematicBlock
 {
-	public override BlockType BlockType { get; } = BlockType.Text;
-	[TextArea(3,20)]
-	public string Text;
+	public override BlockType BlockType => BlockType.Text;
 
-	private void Start()
+	private TMP_Text _textMesh;
+	private MeshRenderer _renderer;
+
+	private void Awake()
 	{
-		GetComponent<MeshRenderer>().hideFlags = HideFlags.HideInInspector;
-		GetComponent<TextMeshPro>().hideFlags = HideFlags.HideInInspector;
+		TryGetComponent(out _textMesh);
+		TryGetComponent(out _renderer);
 	}
 
-	public override bool Compile(SchematicBlockData block, Schematic _)
+	private void Update()
 	{
-		block.BlockType = BlockType;
-		block.Properties = new Dictionary<string, object>()
+		_textMesh.margin = Vector4.zero;
+		_renderer.hideFlags = HideFlags.HideInInspector;
+	}
+
+	public override void Compile(SchematicBlockData block)
+	{
+		block.Properties = new Dictionary<string, object>
 		{
-			{ "Text", Text }
+			{ "Text", _textMesh.text },
+			{ "DisplaySize", (SerializableVector)_textMesh.rectTransform.sizeDelta }
 		};
-		return true;
+
+		base.Compile(block);
 	}
-	
-	public void OnValidate()
+
+	public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
 	{
-		GetComponent<MeshRenderer>().hideFlags = HideFlags.HideInInspector;
-		GetComponent<TextMeshPro>().hideFlags = HideFlags.HideInInspector;
-		GetComponent<TextMeshPro>().text = Text;
+		TMP_Text text = Create<GameObject>("Assets/Resources/Blocks/Text.prefab").GetComponent<TMP_Text>();
+		gameObject = text.gameObject;
+
+		text.text = Convert.ToString(block.Properties["Text"]);
+		text.rectTransform.sizeDelta = JsonConvert.DeserializeObject<Vector2>(block.Properties["DisplaySize"].ToString());
+
+		base.Decompile(ref gameObject, block, parent);
 	}
 }

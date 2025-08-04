@@ -19,6 +19,9 @@ public class LockerItem
         ProbabilityPoints = serializableLockerItem.ProbabilityPoints;
         MinPerChamber = serializableLockerItem.MinPerChamber;
         MaxPerChamber = serializableLockerItem.MaxPerChamber;
+        //Count = serializableLockerItem.Count;
+        // Attachments = serializableLockerItem.Attachments;
+        //Chance = serializableLockerItem.Chance;
     }
     
     [Tooltip("The ItemType of this pickup.")]
@@ -35,4 +38,10 @@ public class LockerItem
     
     [Min(0)]
     public int MaxPerChamber = 10;
+    //public uint Count = 1;
+
+    // [ReorderableList]
+    // public List<AttachmentName> Attachments = new List<AttachmentName>();
+
+    //public float Chance = 100;
 }

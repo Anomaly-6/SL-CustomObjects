@@ -24,6 +24,7 @@ public class SerializableLockerItem
     
     [Range(0, 100)]
     public int ProbabilityPoints = 100;
+    // public List<AttachmentName> Attachments { get; set; }
 
     [Min(0)]
     public int MinPerChamber = 1;

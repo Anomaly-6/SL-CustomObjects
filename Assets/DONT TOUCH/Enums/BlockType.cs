@@ -8,11 +8,12 @@
     Schematic = 5,
     Teleport = 6,
     Locker = 7,
-    Door = 8,
+    Text = 8,
     Interactable = 9,
-    Text = 10,
-    Camera = 11,
-    ShootingTarget = 12,
-    PlayerSpawnPoint = 13,
-    Capybara = 14,
+    Waypoint = 10,
+    Door = 30, // when merging replace with normal serial number
+    Camera = 31,
+    ShootingTarget = 32,
+    PlayerSpawnPoint = 33,
+    Capybara = 34,
 }
