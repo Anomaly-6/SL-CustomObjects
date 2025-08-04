@@ -579,7 +579,7 @@ GameObject:
   - component: {fileID: 4254519232810580}
   - component: {fileID: 183995835353082797}
   m_Layer: 0
-  m_Name: binaryTargetPrefab
+  m_Name: Binary
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

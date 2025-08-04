@@ -662,7 +662,7 @@ GameObject:
   - component: {fileID: 4594145264658493}
   - component: {fileID: 3887438498282587548}
   m_Layer: 0
-  m_Name: MiscLocker
+  m_Name: Misc
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -764,7 +764,7 @@ MonoBehaviour:
     ProbabilityPoints: 1
     MinPerChamber: 1
     MaxPerChamber: 1
-  LockerType: 0
+  LockerType: 3
 --- !u!1 &1778969084875791
 GameObject:
   m_ObjectHideFlags: 0

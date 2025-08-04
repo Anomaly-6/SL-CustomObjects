@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,14 +9,22 @@ public class Scp079CameraComponent : SchematicBlock
 	public CameraType CameraType;
 	public string Label;
 
-	public override bool Compile(SchematicBlockData block, Schematic _)
+	public override void Compile(SchematicBlockData block)
 	{
-		block.BlockType = BlockType;
 		block.Properties = new Dictionary<string, object>()
 		{
 			{ nameof(CameraType), CameraType },
 			{ nameof(Label), Label }
 		};
-		return true;
+		base.Compile(block);
+	}
+
+	public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
+	{
+		CameraType cameraType = (CameraType)Convert.ToInt32(block.Properties["CameraType"]);
+		Scp079CameraComponent camera = Create<Scp079CameraComponent>($"Assets/Resources/Blocks/Cameras/{cameraType}.prefab");
+		gameObject = camera.gameObject;
+		camera.Label = Convert.ToString(block.Properties["Label"]);
+		base.Decompile(ref gameObject, block, parent);
 	}
 }

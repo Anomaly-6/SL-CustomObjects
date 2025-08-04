@@ -5,9 +5,15 @@ public class CapybaraComponent : SchematicBlock
 {
 	public override BlockType BlockType { get; } = BlockType.Capybara;
 
-	public override bool Compile(SchematicBlockData block, Schematic schematic)
+	public override void Compile(SchematicBlockData block)
 	{
-		block.BlockType = BlockType.Capybara;
-		return true;
+		base.Compile(block);
+	}
+
+	public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
+	{
+		CapybaraComponent capybara = Create<CapybaraComponent>("Assets/Resources/Blocks/Capybara.prefab");
+		gameObject = capybara.gameObject;
+		base.Decompile(ref gameObject, block, parent);
 	}
 }

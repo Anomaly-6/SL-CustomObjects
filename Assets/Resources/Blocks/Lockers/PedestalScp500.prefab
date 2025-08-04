@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 5321369706818857007}
   - component: {fileID: -3846598772920230607}
   m_Layer: 30
-  m_Name: Pedestal
+  m_Name: PedestalScp500
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

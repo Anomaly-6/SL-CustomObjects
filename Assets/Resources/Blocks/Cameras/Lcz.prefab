@@ -387,7 +387,7 @@ GameObject:
   - component: {fileID: 4428982252397947}
   - component: {fileID: -3540541200357538188}
   m_Layer: 0
-  m_Name: LczCameraToy
+  m_Name: Lcz
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

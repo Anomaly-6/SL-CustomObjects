@@ -1179,7 +1179,7 @@ GameObject:
   - component: {fileID: 6387093178930934018}
   - component: {fileID: 8217665962977839351}
   m_Layer: 0
-  m_Name: LargeGunLocker
+  m_Name: LargeGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -86,6 +86,74 @@ public class RightClickMenuExtended
 	[MenuItem("GameObject/🛠️ MER Blocks/Doors/Gate", false, -1)]
 	private static void CreateGateDoor(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Doors/Gate.prefab");
 	#endregion
+
+	#region Lockers
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Lockers/Adrenaline", false, -1)]
+	private static void CreateAdrenalineLocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Lockers/Adrenaline.prefab");
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/Lockers/Medkit", false, -1)]
+	private static void CreateMedkitLocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Lockers/Medkit.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Lockers/Large Gun", false, -1)]
+	private static void CreateLargeGunLocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Lockers/LargeGun.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Lockers/Experimental Weapon", false, -1)]
+	private static void CreateExperimentalWeaponLocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Lockers/ExperimentalWeapon.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Lockers/Misc", false, -1)]
+	private static void CreateMiscLocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Lockers/Misc.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Lockers/Pedestal", false, -1)]
+	private static void CreatePedestalLocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Lockers/PedestalScp500.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Lockers/Rifle Rack", false, -1)]
+	private static void CreateRifleRackLocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Lockers/RifleRack.prefab");
+	
+	#endregion
+
+	#region Shooting Targets
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Shooting Targets/Binary", false, -1)]
+	private static void CreateBinaryShootingTarget(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/ShootingTargets/Binary.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Shooting Targets/ClassD", false, -1)]
+	private static void CreateClassDShootingTarget(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/ShootingTargets/ClassD.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Shooting Targets/Sport", false, -1)]
+	private static void CreateSportShootingTarget(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/ShootingTargets/Sport.prefab");
+	
+	#endregion
+
+	#region Cameras
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Cameras/Ez", false, -1)]
+	private static void CreateEzCamera(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Cameras/Ez.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Cameras/Ez arm", false, -1)]
+	private static void CreateEzArmCamera(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Cameras/EzArm.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Cameras/Hcz", false, -1)]
+	private static void CreateHczCamera(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Cameras/Hcz.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Cameras/Lcz", false, -1)]
+	private static void CreateLczCamera(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Cameras/Lcz.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Cameras/Sz", false, -1)]
+	private static void CreateSzCamera(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Cameras/Sz.prefab");
+
+	#endregion
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/SpawnPoint", false, -1)]
+	private static void CreateSpawnPoint(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/SpawnPoint.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/Teleporter", false, -1)]
+	private static void CreateTeleporter(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Teleporter.prefab");
+
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/Capybara", false, -1)]
+	private static void CreateCapybara(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Capybara.prefab");
+
 	
 	[MenuItem("GameObject/🛠️ MER Blocks/Waypoint", false, -1)]
 	private static void CreateWaypoint(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Waypoint.prefab");

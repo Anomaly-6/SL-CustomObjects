@@ -32,64 +32,22 @@ public class Schematic : SchematicBlock
 
             SchematicBlockData data = new();
             block.Compile(data);
-
-            SchematicBlockData block = new SchematicBlockData
+            
+            foreach (var blockData in BlockList.Blocks)
             {
-                Name = obj.name,
-                ObjectId = objectId,
-                ParentId = obj.parent.GetInstanceID(),
-
-                Position = obj.localPosition,
-                Rotation = obj.localEulerAngles,
-                Scale = obj.localScale
-            };
-
-            if (obj.TryGetComponent(out SchematicBlock schematicBlock))
-            {
-                if (!schematicBlock.Compile(block, this))
-                    continue;
-                foreach (var blockData in BlockList.Blocks)
-                {
-                    if (block.BlockType is BlockType.Primitive or BlockType.Schematic or BlockType.Empty or BlockType.Light or BlockType.Pickup) continue;
-                    if (blockData.Name != block.Name) continue;
-                    string errorMsg = $"Найдено несколько блоков с именем «{blockData.Name}»! Переименуйте их, чтобы каждый имел уникальное имя.";
-                    EditorUtility.DisplayDialog(
-                        "Ошибка компиляции схемы",
-                        errorMsg,
-                        "ОК"
-                    );
-                    Debug.LogError(errorMsg);
-                    return;
-                }
-            }
-            else
-            {
-                // Light
-                if (obj.TryGetComponent(out Light lightComponent))
-                {
-                    block.BlockType = BlockType.Light;
-                    block.Scale = null;
-                    block.Properties = new Dictionary<string, object>
-                    {
-                        { "LightType", lightComponent.type },
-                        { "Color", ColorUtility.ToHtmlStringRGBA(lightComponent.color) },
-                        { "Intensity", lightComponent.intensity },
-                        { "Range", lightComponent.range },
-                        { "Shape", lightComponent.shape },
-                        { "SpotAngle", lightComponent.spotAngle },
-                        { "InnerSpotAngle", lightComponent.innerSpotAngle },
-                        { "ShadowStrength", lightComponent.shadowStrength },
-                        { "ShadowType", lightComponent.shadows },
-                        { "Static", lightComponent.gameObject.isStatic }
-                    };
-                }
-                else // Empty transform
-                {
-                    block.BlockType = BlockType.Empty;
-                }
+                if (block.BlockType is BlockType.Primitive or BlockType.Schematic or BlockType.Empty or BlockType.Light or BlockType.Pickup) continue;
+                if (blockData.Name != block.name) continue;
+                string errorMsg = $"Найдено несколько блоков с именем «{blockData.Name}»! Переименуйте их, чтобы каждый имел уникальное имя.";
+                EditorUtility.DisplayDialog(
+                    "Ошибка компиляции схемы",
+                    errorMsg,
+                    "ОК"
+                );
+                Debug.LogError(errorMsg);
+                return;
             }
 
-            if (obj.TryGetComponent(out Animator animator) && animator.runtimeAnimatorController != null)
+            if (block.TryGetComponent(out Animator animator) && animator.runtimeAnimatorController != null)
             {
                 RuntimeAnimatorController runtimeAnimatorController = animator.runtimeAnimatorController;
                 data.AnimatorName = runtimeAnimatorController.name;

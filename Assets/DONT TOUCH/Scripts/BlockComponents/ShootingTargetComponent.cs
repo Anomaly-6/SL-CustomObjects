@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,13 +8,20 @@ public class ShootingTargetComponent : SchematicBlock
 	public override BlockType BlockType { get; } = BlockType.ShootingTarget;
 	public TargetType TargetType;
 	
-	public override bool Compile(SchematicBlockData block, Schematic schematic)
+	public override void Compile(SchematicBlockData block)
 	{
-		block.BlockType = BlockType;
 		block.Properties = new Dictionary<string, object>()
 		{
 			{ nameof(TargetType), TargetType },
 		};
-		return true;
+		base.Compile(block);
+	}
+
+	public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
+	{
+		TargetType targetType = (TargetType)Convert.ToInt32(block.Properties["TargetType"]);
+		ShootingTargetComponent shootingTarget = Create<ShootingTargetComponent>($"Assets/Resources/Blocks/ShootingTargets/{targetType}.prefab");
+		gameObject = shootingTarget.gameObject;
+		base.Decompile(ref gameObject, block, parent);
 	}
 }

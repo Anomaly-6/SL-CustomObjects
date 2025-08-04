@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 4803033633036725}
   - component: {fileID: 3535537525671413999}
   m_Layer: 0
-  m_Name: CapybaraToy
+  m_Name: Capybara
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
