@@ -19,7 +19,7 @@ public class PlayerSpawnPointComponent : SchematicBlock
 
 	public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
 	{
-		PlayerSpawnPointComponent spawnPoint = Create<PlayerSpawnPointComponent>("Assets/Resources/Blocks/Doors/SpawnPoint.prefab");
+		PlayerSpawnPointComponent spawnPoint = Create<PlayerSpawnPointComponent>("Assets/Resources/Blocks/SpawnPoint.prefab");
 		gameObject = spawnPoint.gameObject;
 		foreach (var role in ((JArray)block.Properties["Roles"]).ToObject<List<RoleTypeId>>())
 		{
