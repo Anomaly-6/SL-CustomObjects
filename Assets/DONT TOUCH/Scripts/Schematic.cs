@@ -35,7 +35,17 @@ public class Schematic : SchematicBlock
             
             foreach (var blockData in BlockList.Blocks)
             {
-                if (block.BlockType is BlockType.Primitive or BlockType.Schematic or BlockType.Empty or BlockType.Light or BlockType.Pickup) continue;
+                if (block.BlockType is 
+                    BlockType.Light or 
+                    BlockType.Empty or 
+                    BlockType.Interactable or 
+                    BlockType.Primitive or 
+                    BlockType.Schematic or 
+                    BlockType.Pickup or
+                    BlockType.Waypoint or 
+                    BlockType.Text or 
+                    BlockType.Workstation)
+                    continue;
                 if (blockData.Name != block.name) continue;
                 string errorMsg = $"Найдено несколько блоков с именем «{blockData.Name}»! Переименуйте их, чтобы каждый имел уникальное имя.";
                 EditorUtility.DisplayDialog(
