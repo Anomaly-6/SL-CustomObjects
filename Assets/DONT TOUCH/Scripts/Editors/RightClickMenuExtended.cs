@@ -158,6 +158,10 @@ public class RightClickMenuExtended
 	[MenuItem("GameObject/🛠️ MER Blocks/Waypoint", false, -1)]
 	private static void CreateWaypoint(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Waypoint.prefab");
 
+	[MenuItem("GameObject/🛠️ MER Blocks/PlayerBlocker", false, -1)]
+	private static void CreatePlayerBlocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/PlayerBlocker.prefab");
+
+	
 	private static void CreateBlock(MenuCommand menuCommand, string prefabPath)
 	{
 		GameObject instance = SchematicBlock.Create<GameObject>(prefabPath);
