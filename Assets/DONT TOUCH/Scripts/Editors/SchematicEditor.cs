@@ -9,7 +9,6 @@
     {
         public override void OnInspectorGUI()
         {
-            DrawDefaultInspector();
             Schematic schematic = (Schematic)target;
 
             GUILayout.Label($"<color=white>Number of blocks: <b>{schematic.GetComponentsInChildren<SchematicBlock>().Length - 1}</b></color>", SchematicManager.UnityRichTextStyle);

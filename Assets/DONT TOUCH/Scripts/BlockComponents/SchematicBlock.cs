@@ -6,6 +6,8 @@ using UnityEngine;
 public abstract class SchematicBlock : MonoBehaviour
 {
     public abstract BlockType BlockType { get; }
+    [Tooltip("Сглаживание передвижения объекта"), Range(0, 255)]
+    public byte MovementSmoothing = 60;
 
     public static T Create<T>(string prefabPath) where T : UnityEngine.Object
     {
@@ -39,12 +41,14 @@ public abstract class SchematicBlock : MonoBehaviour
         if (block.Properties != null)
         {
             block.Properties.Add("Static", gameObject.isStatic);
+            block.Properties.Add("MovementSmoothing", MovementSmoothing);
         }
         else
         {
             block.Properties = new Dictionary<string, object>()
             {
-                { "Static", gameObject.isStatic }
+                { "Static", gameObject.isStatic },
+                { "MovementSmoothing", MovementSmoothing }
             };
         }
     }
@@ -58,7 +62,13 @@ public abstract class SchematicBlock : MonoBehaviour
         t.localPosition = block.Position;
         t.localEulerAngles = block.Rotation != null ? block.Rotation : Vector3.zero;
         t.localScale = block.Scale != null ? block.Scale == Vector3.zero ? Vector3.one : block.Scale : Vector3.one;
-
-        gameObject.isStatic = block.Properties != null && block.Properties.TryGetValue("Static", out object isStatic) && Convert.ToBoolean(isStatic);
+        if (block.Properties != null)
+        {
+            gameObject.isStatic = block.Properties.TryGetValue("Static", out object isStatic) && Convert.ToBoolean(isStatic);
+            if (block.Properties.TryGetValue("MovementSmoothing", out object movementSmoothing))
+            {
+                MovementSmoothing = Convert.ToByte(movementSmoothing);
+            }
+        }
     }
 }
