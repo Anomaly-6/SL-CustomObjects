@@ -160,6 +160,9 @@ public class RightClickMenuExtended
 
 	[MenuItem("GameObject/🛠️ MER Blocks/PlayerBlocker", false, -1)]
 	private static void CreatePlayerBlocker(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/PlayerBlocker.prefab");
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/CullingParent", false, -1)]
+	private static void CreateCullingParent(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/CullingParent.prefab");
 
 	
 	private static void CreateBlock(MenuCommand menuCommand, string prefabPath)

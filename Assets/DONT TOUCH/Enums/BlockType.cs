@@ -17,4 +17,5 @@
     PlayerSpawnPoint = 33,
     Capybara = 34,
     PlayerBlocker = 35,
+    CullingParent = 36,
 }

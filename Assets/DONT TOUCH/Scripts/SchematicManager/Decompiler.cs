@@ -34,6 +34,8 @@ public static class Decompiler
 			Dict.Add(BlockType.ShootingTarget, gameObject.AddComponent<ShootingTargetComponent>());
 			Dict.Add(BlockType.PlayerSpawnPoint, gameObject.AddComponent<PlayerSpawnPointComponent>());
 			Dict.Add(BlockType.Capybara, gameObject.AddComponent<CapybaraComponent>());
+			Dict.Add(BlockType.PlayerBlocker, gameObject.AddComponent<PlayerBlockerComponent>());
+			Dict.Add(BlockType.CullingParent, gameObject.AddComponent<CullingParentComponent>());
 			return this;
 		}
 	}
