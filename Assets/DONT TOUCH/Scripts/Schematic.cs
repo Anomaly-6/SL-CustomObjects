@@ -44,7 +44,10 @@ public class Schematic : SchematicBlock
                     BlockType.Pickup or
                     BlockType.Waypoint or 
                     BlockType.Text or 
-                    BlockType.Workstation)
+                    BlockType.Workstation or 
+                    BlockType.Clutter or 
+                    BlockType.MirrorPrefab or 
+                    BlockType.PlayerBlocker)
                     continue;
                 if (blockData.Name != block.name) continue;
                 string errorMsg = $"Найдено несколько блоков с именем «{blockData.Name}»! Переименуйте их, чтобы каждый имел уникальное имя.";

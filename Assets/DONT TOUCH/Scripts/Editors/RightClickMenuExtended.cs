@@ -163,8 +163,39 @@ public class RightClickMenuExtended
 	
 	[MenuItem("GameObject/🛠️ MER Blocks/CullingParent", false, -1)]
 	private static void CreateCullingParent(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/CullingParent.prefab");
-
 	
+	#region MirrorPrefabs
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/MirrorPrefabs/Broken Electrical Box", false, -1)]
+	private static void CreateBrokenElectricalBox(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/MirrorPrefabs/BrokenElectricalBox.prefab");
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/MirrorPrefabs/Simple Boxes", false, -1)]
+	private static void CreateSimpleBoxes(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/MirrorPrefabs/SimpleBoxes.prefab");
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/MirrorPrefabs/Pipes Short", false, -1)]
+	private static void CreatePipesShort(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/MirrorPrefabs/PipesShort.prefab");
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/MirrorPrefabs/Boxes Ladder", false, -1)]
+	private static void CreateBoxesLadder(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/MirrorPrefabs/BoxesLadder.prefab");
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/MirrorPrefabs/Tank-Supported Shelf", false, -1)]
+	private static void CreateTankSupportedShelf(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/MirrorPrefabs/TankSupportedShelf.prefab");
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/MirrorPrefabs/Angled Fences", false, -1)]
+	private static void CreateAngledFences(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/MirrorPrefabs/AngledFences.prefab");
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/MirrorPrefabs/Huge Orange Pipes", false, -1)]
+	private static void CreateHugeOrangePipes(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/MirrorPrefabs/HugeOrangePipes.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/MirrorPrefabs/PipesLong", false, -1)]
+	private static void CreatePipesLong(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/MirrorPrefabs/PipesLong.prefab");
+	
+	#endregion
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/Clutter", false, -1)]
+	private static void CreateClutter(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Clutter.prefab");
+
+
 	private static void CreateBlock(MenuCommand menuCommand, string prefabPath)
 	{
 		GameObject instance = SchematicBlock.Create<GameObject>(prefabPath);

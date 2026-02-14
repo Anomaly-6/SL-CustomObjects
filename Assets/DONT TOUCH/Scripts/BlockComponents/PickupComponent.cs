@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode, SelectionBase]
 public class PickupComponent : SchematicBlock
 {
     [Tooltip("The ItemType of this pickup.")]

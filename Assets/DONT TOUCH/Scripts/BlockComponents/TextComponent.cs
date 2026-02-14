@@ -12,7 +12,7 @@ public class TextComponent : SchematicBlock
 	private TMP_Text _textMesh;
 	private MeshRenderer _renderer;
 
-	private void Awake()
+	private void Start()
 	{
 		TryGetComponent(out _textMesh);
 		TryGetComponent(out _renderer);

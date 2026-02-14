@@ -177,7 +177,7 @@ public class TeleportComponent : SchematicBlock
     private MeshFilter _filter;
     private MeshRenderer _renderer;
     
-    private void Awake()
+    private void Start()
     {
         TryGetComponent(out _filter);
         TryGetComponent(out _renderer);

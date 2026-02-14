@@ -71,4 +71,21 @@ public abstract class SchematicBlock : MonoBehaviour
             }
         }
     }
+    
+    public void Awake()
+    {
+        LockChildrenRecursive(transform);
+    }
+    
+    private void LockChildrenRecursive(Transform parent)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.TryGetComponent<SchematicBlock>(out _))
+                continue;
+            child.gameObject.hideFlags |= HideFlags.NotEditable;
+            
+            LockChildrenRecursive(child);
+        }
+    }
 }

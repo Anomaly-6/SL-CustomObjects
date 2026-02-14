@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[ExecuteInEditMode]
+[ExecuteInEditMode, SelectionBase]
 public class WaypointComponent : SchematicBlock
 {
 	public override BlockType BlockType => BlockType.Waypoint;

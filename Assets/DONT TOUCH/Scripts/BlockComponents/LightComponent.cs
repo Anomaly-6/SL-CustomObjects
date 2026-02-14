@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode, SelectionBase]
 public class LightComponent : SchematicBlock
 {
 	public override BlockType BlockType => BlockType.Light;
