@@ -171,9 +171,31 @@ public static class Decompiler
 
 		if (!string.IsNullOrEmpty(animatorName))
 		{
-			Object animatorObject = AssetBundle.GetAllLoadedAssetBundles()
-				.FirstOrDefault(x => x.mainAsset.name == animatorName)?.LoadAllAssets()
-				.First(x => x is RuntimeAnimatorController);
+			Object animatorObject = null;
+			var list = AssetBundle.GetAllLoadedAssetBundles();
+			if (list != null)
+			{
+				AssetBundle assetBundle = null;
+				foreach (var asset in list)
+				{
+					if (asset?.mainAsset?.name == animatorName)
+					{
+						assetBundle = asset;
+						break;
+					}
+				}
+				if (assetBundle != null)
+				{
+					foreach (var asset in assetBundle.LoadAllAssets())
+					{
+						if (asset is RuntimeAnimatorController controller)
+						{
+							animatorObject = controller;
+							break;
+						}
+					}
+				}
+			}
 
 			if (animatorObject == null)
 			{
@@ -181,11 +203,24 @@ public static class Decompiler
 
 				if (!File.Exists(path))
 					return false;
-
-				animatorObject = AssetBundle.LoadFromFile(path).LoadAllAssets()
-					.First(x => x is RuntimeAnimatorController);
+				Debug.Log($"Trying to find animator controller at {path}");
+				var assets = AssetBundle.LoadFromFile(path).LoadAllAssets();
+				foreach (var asset in assets)
+				{
+					if (asset is RuntimeAnimatorController controller)
+					{
+						animatorObject = controller;
+						break;
+					}
+				}
 			}
 
+			if (animatorObject == null)
+			{
+				Debug.LogError($"Аниматор \"{animatorName}\" не получилось загрузить по какой то причине.\nПопробуй заново сделать анимацию, либо тут какая то другая хуйня. Возможно при сохранение схематики анимация была в оперативной памяти и все сломалось");
+				return false;
+			}
+			
 			animatorController = animatorObject as RuntimeAnimatorController;
 			return true;
 		}
