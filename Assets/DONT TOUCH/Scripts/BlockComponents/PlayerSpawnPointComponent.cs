@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerSpawnPointComponent : SchematicBlock
 {
 	public override BlockType BlockType { get; } = BlockType.PlayerSpawnPoint;
-	public List<RoleTypeId> Roles = new();
+	public List<DefualtRoleTypeId> Roles = new();
 	
 	public override void Compile(SchematicBlockData block)
 	{
@@ -21,7 +21,7 @@ public class PlayerSpawnPointComponent : SchematicBlock
 	{
 		PlayerSpawnPointComponent spawnPoint = Create<PlayerSpawnPointComponent>("Assets/Resources/Blocks/SpawnPoint.prefab");
 		gameObject = spawnPoint.gameObject;
-		foreach (var role in ((JArray)block.Properties["Roles"]).ToObject<List<RoleTypeId>>())
+		foreach (var role in ((JArray)block.Properties["Roles"]).ToObject<List<DefualtRoleTypeId>>())
 		{
 			spawnPoint.Roles.Add(role);
 		}		
