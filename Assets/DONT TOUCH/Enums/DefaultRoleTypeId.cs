@@ -1,4 +1,4 @@
-public enum DefualtRoleTypeId : sbyte
+public enum DefaultRoleTypeId : sbyte
 {
 	None = -1, // 0xFF
 	Scp173 = 0,

@@ -6,7 +6,10 @@ using UnityEngine;
 public class LightComponent : SchematicBlock
 {
 	public override BlockType BlockType => BlockType.Light;
-
+	[Tooltip("Будет ли свет выключаться при выключения света в комплексе?")]
+	public bool Flicker;
+	public DefaultFacilityZone FlickerZone;
+	
 	public override void Compile(SchematicBlockData block)
 	{
 		TryGetComponent(out Light light);
@@ -22,6 +25,8 @@ public class LightComponent : SchematicBlock
 			{ "InnerSpotAngle", light.innerSpotAngle },
 			{ "ShadowStrength", light.shadowStrength },
 			{ "ShadowType", light.shadows },
+			{ nameof(Flicker), Flicker },
+			{ nameof(FlickerZone), FlickerZone },
 		};
 
 		base.Compile(block);
@@ -51,6 +56,16 @@ public class LightComponent : SchematicBlock
 			light.shadowStrength = Convert.ToSingle(block.Properties["ShadowStrength"]);
 		}
 
+		if (block.Properties.TryGetValue(nameof(Flicker), out object flickerEnable))
+		{
+			Flicker = Convert.ToBoolean(flickerEnable);
+		}
+
+		if (block.Properties.TryGetValue(nameof(FlickerZone), out object flickerZone))
+		{
+			FlickerZone = (DefaultFacilityZone)Convert.ToInt32(flickerZone);
+		}
+		
 		base.Decompile(ref gameObject, block, parent);
 	}
 }
