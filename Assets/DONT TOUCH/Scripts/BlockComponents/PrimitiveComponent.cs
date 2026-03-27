@@ -144,7 +144,7 @@ public class PrimitiveComponent : SchematicBlock
             return;
 
         Gizmos.color = new Color(Color.r, Color.g, Color.b, 1f);
-        Gizmos.DrawWireMesh(_filter.sharedMesh, 0, transform.position, transform.rotation, transform.localScale);
+        Gizmos.DrawWireMesh(_filter.sharedMesh, 0, transform.position, transform.rotation, transform.lossyScale);
     }
 
     internal MeshFilter _filter;
