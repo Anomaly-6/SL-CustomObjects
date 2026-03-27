@@ -16,6 +16,8 @@ public class PrimitiveComponent : SchematicBlock
 
     [Tooltip("Whether the primitive should be visible in game.")]
     public bool Visible = true;
+    
+    public bool Trigger = false;
 
     public override BlockType BlockType => BlockType.Primitive;
 
@@ -33,6 +35,7 @@ public class PrimitiveComponent : SchematicBlock
             { "PrimitiveType", (PrimitiveType)Enum.Parse(typeof(PrimitiveType), tag) },
             { "Color", ColorString },
             { "PrimitiveFlags", primitiveFlags },
+            { "Trigger", Trigger },
         };
 
         base.Compile(block);
@@ -57,6 +60,11 @@ public class PrimitiveComponent : SchematicBlock
             primitiveFlags = PrimitiveFlags.Visible;
             if (block.Scale.x >= 0f)
                 primitiveFlags |= PrimitiveFlags.Collidable;
+        }
+
+        if (block.Properties.TryGetValue("Trigger", out object trigger))
+        {
+            primitiveComponent.Trigger = Convert.ToBoolean(trigger);
         }
 
         primitiveComponent.Collidable = primitiveFlags.HasFlag(PrimitiveFlags.Collidable);
@@ -115,6 +123,9 @@ public class PrimitiveComponent : SchematicBlock
     {
         _filter.hideFlags = HideFlags.HideInInspector;
         _renderer.hideFlags = HideFlags.HideInInspector;
+        
+        if (Trigger)
+            Collidable = false;
 
 #if UNITY_EDITOR
         if (EditorUtility.IsPersistent(gameObject))
