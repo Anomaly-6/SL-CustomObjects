@@ -38,6 +38,7 @@ public static class Decompiler
 			Dict.Add(BlockType.CullingParent, gameObject.AddComponent<CullingParentComponent>());
 			Dict.Add(BlockType.MirrorPrefab, gameObject.AddComponent<MirrorPrefabComponent>());
 			Dict.Add(BlockType.Clutter, gameObject.AddComponent<ClutterComponent>());
+			Dict.Add(BlockType.Trigger, gameObject.AddComponent<TriggerComponent>());
 			return this;
 		}
 	}

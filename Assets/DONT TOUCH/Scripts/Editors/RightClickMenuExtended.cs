@@ -194,7 +194,9 @@ public class RightClickMenuExtended
 	
 	[MenuItem("GameObject/🛠️ MER Blocks/Clutter", false, -1)]
 	private static void CreateClutter(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Clutter.prefab");
-
+	
+	[MenuItem("GameObject/🛠️ MER Blocks/Trigger", false, -1)]
+	private static void CreateTrigger(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Trigger.prefab");
 
 	private static void CreateBlock(MenuCommand menuCommand, string prefabPath)
 	{

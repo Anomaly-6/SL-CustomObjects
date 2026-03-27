@@ -47,7 +47,9 @@ public class Schematic : SchematicBlock
                     BlockType.Workstation or 
                     BlockType.Clutter or 
                     BlockType.MirrorPrefab or 
-                    BlockType.PlayerBlocker)
+                    BlockType.PlayerBlocker or 
+                    BlockType.Trigger or 
+                    BlockType.CullingParent)
                     continue;
                 if (blockData.Name != block.name) continue;
                 string errorMsg = $"Найдено несколько блоков с именем «{blockData.Name}»! Переименуйте их, чтобы каждый имел уникальное имя.";
