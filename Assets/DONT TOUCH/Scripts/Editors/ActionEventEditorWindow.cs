@@ -747,6 +747,7 @@ public class ActionEventEditorWindow : EditorWindow
             ActionType.Command => "console.infoicon.sml",
             ActionType.Animation => "Animation Icon",
             ActionType.Audio => "AudioSource Icon",
+            ActionType.Destroy => "d_console.erroricon.sml",
             _ => "FilterByType",
         };
 
