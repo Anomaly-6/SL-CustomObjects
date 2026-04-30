@@ -131,7 +131,8 @@ public class PrimitiveComponent : SchematicBlock
     {
         if (Visible)
             return;
-
+        if (_filter == null || _filter.sharedMesh == null)
+            return;
         Gizmos.color = new Color(Color.r, Color.g, Color.b, 1f);
         Gizmos.DrawWireMesh(_filter.sharedMesh, 0, transform.position, transform.rotation, transform.lossyScale);
     }

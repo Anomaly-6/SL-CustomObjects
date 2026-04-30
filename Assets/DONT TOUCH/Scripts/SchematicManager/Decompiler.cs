@@ -109,6 +109,7 @@ public static class Decompiler
 
 		CreateRecursiveFromID(_schematicData.RootObjectId, _schematicData.Blocks, _rootTransform);
 		CreateTeleporters(_schematicData.Blocks);
+		CreateActionTargets(_schematicData.Blocks);
 		if (_schematicDirectoryPath != null)
 		{
 			// CreateTeleporters();
@@ -305,6 +306,22 @@ public static class Decompiler
 		//         targetTeleporter.Teleporter = _objectFromId[targetTeleporter.Id].GetComponent<TeleportComponent>();
 		//     }
 		// }
+	}
+
+	private static void CreateActionTargets(List<SchematicBlockData> blocks)
+	{
+		foreach (SchematicBlockData block in blocks)
+		{
+			if (!_objectFromId.TryGetValue(block.ObjectId, out Transform objectTransform))
+				continue;
+
+			if (!objectTransform.TryGetComponent(out SchematicBlock schematicBlock) ||
+			    schematicBlock is not IActionEventHost actionEventHost)
+				continue;
+
+			actionEventHost.EnsureActionEventsInitialized();
+			ActionEventSerialization.RebindTargets(actionEventHost.ActionEvents, _objectFromId);
+		}
 	}
 
 	private static void AddRigidbodies()

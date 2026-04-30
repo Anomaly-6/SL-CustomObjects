@@ -1,0 +1,43 @@
+using System.Collections.Generic;
+
+public abstract class ActionEventHostBlockBase : SchematicBlock, IActionEventHost
+{
+    public List<ActionEventList> ActionEvents = new();
+
+    List<ActionEventList> IActionEventHost.ActionEvents
+    {
+        get => ActionEvents;
+        set => ActionEvents = value;
+    }
+
+    public abstract List<ActionEventList> CreateDefaultActionEvents();
+    void IActionEventHost.EnsureActionEventsInitialized() => EnsureActionEventsInitialized();
+
+    protected void PrepareActionEventsForCompile()
+    {
+        ActionEventSerialization.PrepareHostForCompile(this);
+    }
+
+    protected void ReadActionEventsFromProperties(Dictionary<string, object> properties, string key = nameof(ActionEvents))
+    {
+        ActionEventSerialization.ReadHostEventListsFromProperties(this, properties, key);
+    }
+
+    protected void EnsureActionEventsInitialized()
+    {
+        if (ActionEvents == null || ActionEvents.Count == 0)
+            ActionEvents = CreateDefaultActionEvents();
+
+        ActionEventSerialization.EnsureEventLists(ActionEvents);
+    }
+
+    protected virtual void Reset()
+    {
+        EnsureActionEventsInitialized();
+    }
+
+    protected virtual void OnValidate()
+    {
+        EnsureActionEventsInitialized();
+    }
+}

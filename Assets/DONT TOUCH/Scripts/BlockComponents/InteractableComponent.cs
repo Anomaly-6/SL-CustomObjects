@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class InteractableComponent : SchematicBlock
+public class InteractableComponent : ActionEventHostBlockBase
 {
 	public ColliderShape Shape;
 
@@ -17,11 +17,14 @@ public class InteractableComponent : SchematicBlock
 
 	public override void Compile(SchematicBlockData block)
 	{
+		PrepareActionEventsForCompile();
+
 		block.Properties = new Dictionary<string, object>
 		{
 			{ "Shape", Shape },
 			{ "InteractionDuration", InteractionDuration },
-			{ "IsLocked", IsLocked }
+			{ "IsLocked", IsLocked },
+			{ nameof(ActionEvents), ActionEvents }
 		};
 
 		base.Compile(block);
@@ -35,8 +38,20 @@ public class InteractableComponent : SchematicBlock
 		interactable.Shape = (ColliderShape)Convert.ToInt32(block.Properties["Shape"]);
 		interactable.InteractionDuration = Convert.ToSingle(block.Properties["InteractionDuration"]);
 		interactable.IsLocked = block.Properties.TryGetValue("IsLocked", out object isLocked) && Convert.ToBoolean(isLocked);
+		interactable.ReadActionEventsFromProperties(block.Properties, nameof(ActionEvents));
 
 		base.Decompile(ref gameObject, block, parent);
+	}
+
+	public override List<ActionEventList> CreateDefaultActionEvents()
+	{
+		return new List<ActionEventList>
+		{
+			new("OnInteracted", "On Interacted"),
+			new("OnSearching", "On Searching"),
+			new("OnSearched", "On Searched"),
+			new("OnSearchAborted", "On Search Aborted")
+		};
 	}
 
 	private void Update()

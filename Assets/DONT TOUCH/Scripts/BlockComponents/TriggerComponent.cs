@@ -5,9 +5,10 @@ using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class TriggerComponent : SchematicBlock
+public class TriggerComponent : ActionEventHostBlockBase
 {
     public PrimitiveType Type;
+
     public override BlockType BlockType => BlockType.Trigger;
 
     internal MeshFilter _filter;
@@ -17,9 +18,12 @@ public class TriggerComponent : SchematicBlock
     
     public override void Compile(SchematicBlockData block)
     {
+        PrepareActionEventsForCompile();
+
         block.Properties = new Dictionary<string, object>
         {
             { "PrimitiveType", Type },
+            { nameof(ActionEvents), ActionEvents },
         };
 
         base.Compile(block);
@@ -27,11 +31,13 @@ public class TriggerComponent : SchematicBlock
 
     public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
     {
-        TriggerComponent interactable =
+        TriggerComponent trigger =
             Instantiate(AssetDatabase.LoadAssetAtPath<TriggerComponent>("Assets/Resources/Blocks/Trigger.prefab"));
-        gameObject = interactable.gameObject;
+        gameObject = trigger.gameObject;
 
-        interactable.Type = (PrimitiveType)Convert.ToInt32(block.Properties["PrimitiveType"]);
+        trigger.Type = (PrimitiveType)Convert.ToInt32(block.Properties["PrimitiveType"]);
+
+        trigger.ReadActionEventsFromProperties(block.Properties, nameof(ActionEvents));
 
         base.Decompile(ref gameObject, block, parent);
     }
@@ -47,8 +53,10 @@ public class TriggerComponent : SchematicBlock
 
     private void Update()
     {
-        _filter.hideFlags = HideFlags.HideInInspector;
-        _renderer.hideFlags = HideFlags.HideInInspector;
+        if (_filter != null)
+            _filter.hideFlags = HideFlags.HideInInspector;
+        if (_renderer != null)
+            _renderer.hideFlags = HideFlags.HideInInspector;
         
         if (Type is PrimitiveType.Quad or PrimitiveType.Plane)
             Type = PrimitiveType.Cube;
@@ -58,5 +66,15 @@ public class TriggerComponent : SchematicBlock
         
         _prevType = Type;
         _filter.sharedMesh = PrimitiveMeshGetter.GetPrimitiveMesh(Type);
+    }
+
+    public override List<ActionEventList> CreateDefaultActionEvents()
+    {
+        return new List<ActionEventList>
+        {
+            new("OnTriggerEnter", "On Enter"),
+            new("OnTriggerExit", "On Exit"),
+            new("OnTriggerStay", "While Inside"),
+        };
     }
 }

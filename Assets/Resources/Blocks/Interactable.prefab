@@ -44,6 +44,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 740abaa8e7d942f4db6ce6666e1b3a5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MovementSmoothing: 60
+  ActionEvents:
+  - Id: OnInteracted
+    DisplayName: On Interacted
+    Actions: []
+  - Id: OnSearching
+    DisplayName: On Searching
+    Actions: []
+  - Id: OnSearched
+    DisplayName: On Searched
+    Actions: []
+  - Id: OnSearchAborted
+    DisplayName: On Search Aborted
+    Actions: []
   Shape: 0
   InteractionDuration: 0
   IsLocked: 0
