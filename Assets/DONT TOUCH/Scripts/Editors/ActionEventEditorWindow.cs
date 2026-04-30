@@ -352,8 +352,6 @@ public class ActionEventEditorWindow : EditorWindow
         }
 
         EditorGUI.LabelField(new Rect(rect.x + 20, y, rect.width, EditorGUIUtility.singleLineHeight), header, EditorStyles.boldLabel);
-        
-
 
         y += LineWithSpacing();
 
@@ -386,11 +384,20 @@ public class ActionEventEditorWindow : EditorWindow
             
             EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), targetProperty);
             GameObject targetPropObj = targetProperty.objectReferenceValue as GameObject;
-            int newTargetIdProp = targetPropObj != null ? targetPropObj.GetInstanceID() : 0;
+            int newTargetIdProp = targetPropObj != null ? targetPropObj.transform.GetInstanceID() : 0;
             if (targetIdProperty.intValue != newTargetIdProp) targetIdProperty.intValue = newTargetIdProp;
             y += LineWithSpacing();
             
             DrawComponentPropertySelection(paramProperty, valueProperty, targetPropObj, rect.x, ref y, rect.width);
+            return;
+        }
+
+        if (actionType == ActionType.Destroy)
+        {
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), targetProperty);
+            GameObject targetPropObj = targetProperty.objectReferenceValue as GameObject;
+            int newTargetIdProp = targetPropObj != null ? targetPropObj.transform.GetInstanceID() : 0;
+            if (targetIdProperty.intValue != newTargetIdProp) targetIdProperty.intValue = newTargetIdProp;
             return;
         }
 

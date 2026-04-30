@@ -47,6 +47,12 @@ public class ActionGame
                 // TargetId заполняется при компиляции из Target
                 ParamType = default;
                 break;
+            case ActionType.Destroy:
+                ParamType = default;
+                BlockType = default;
+                Value = string.Empty;
+                Param = string.Empty;
+                break;
         }
     }
 }
