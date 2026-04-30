@@ -31,7 +31,9 @@ public class ActionInfoWindow : EditorWindow
             "console.infoicon.sml",
             "<b>Command:</b> вызывает команду в админ панели игры.",
             "<b>Animation:</b> изменяет параметры анимации.",
-            "<b>Audio:</b> включает указанный звук. (нужно указать имя файла)"),
+            "<b>Audio:</b> включает указанный звук. (нужно указать имя файла) (WIP)",
+            "<b>Set Component Property:</b> взаимодействие с другими объектами",
+            "<b>Destroy:</b> удаление объекта"),
 
         new(
             "Trigger события",
@@ -39,16 +41,14 @@ public class ActionInfoWindow : EditorWindow
             "<b>On Enter:</b> срабатывает когда игрок входит в триггер",
             "<b>On Exit:</b> срабатывает когда игрок выходит из триггера",
             "<b>While Inside:</b> срабатывает пока игрок внутри триггера"),
-
+        
         new(
-            "Animation Rules",
-            "Animation Icon",
-            "Target must have Animator (or child Animator).",
-            "Param list is pulled from animator parameters.",
-            "Trigger param type: Value is ignored.",
-            "Bool param type: Value is False or True.",
-            "Int param type: Value is integer.",
-            "Float param type: Value is float.")
+            "Interactable события",
+            "d_PlayButton",
+            "<b>On Interacted:</b> игрок нажимает по Interactable (работает при <b>InteractionDuration</b> = 0)",
+            "<b>On Searching:</b> игрок начинает взаимодействовать с Interactable (работает при <b>InteractionDuration</b> > 0)",
+            "<b>On Searched:</b> игрок закончил взаимодействие с Interactable (работает при <b>InteractionDuration</b> > 0)",
+            "<b>On Search Aborted:</b> игрок отменил взаимодействие с Interactable (работает при <b>InteractionDuration</b> > 0)"),
     };
 
     private Vector2 _scroll;
