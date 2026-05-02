@@ -612,9 +612,12 @@ public class ActionEventEditorWindow : EditorWindow
 
     private static void DrawParameterPopup(SerializedProperty paramProperty, AnimatorParameter[] parameters, float x, float y, float width)
     {
-        string[] options = new string[parameters.Length];
+        string[] options = new string[parameters.Length+2];
         for (int i = 0; i < parameters.Length; i++)
             options[i] = parameters[i].name;
+
+        options[parameters.Length] = "Pause";
+        options[parameters.Length+1] = "Resume";
 
         int selectedIndex = System.Array.IndexOf(options, paramProperty.stringValue);
         if (selectedIndex < 0)
@@ -670,9 +673,8 @@ public class ActionEventEditorWindow : EditorWindow
                 y += LineWithSpacing();
                 break;
             }
-
             default:
-                EditorGUI.PropertyField(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), valueProperty);
+                if (valueProperty.stringValue != string.Empty) valueProperty.stringValue = string.Empty;
                 y += LineWithSpacing();
                 break;
         }
