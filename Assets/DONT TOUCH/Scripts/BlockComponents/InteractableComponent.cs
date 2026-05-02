@@ -12,6 +12,10 @@ public class InteractableComponent : ActionEventHostBlockBase
 	public float InteractionDuration;
 
 	public bool IsLocked;
+	
+	[Header("Permissions for actions")]
+	public DoorPermissionFlags Permissions;
+	public bool RequireAll;
 
 	public override BlockType BlockType => BlockType.Interactable;
 
@@ -24,7 +28,9 @@ public class InteractableComponent : ActionEventHostBlockBase
 			{ "Shape", Shape },
 			{ "InteractionDuration", InteractionDuration },
 			{ "IsLocked", IsLocked },
-			{ nameof(ActionEvents), ActionEvents }
+			{ nameof(ActionEvents), ActionEvents },
+			{ nameof(Permissions), Permissions },
+			{ nameof(RequireAll), RequireAll }
 		};
 
 		base.Compile(block);

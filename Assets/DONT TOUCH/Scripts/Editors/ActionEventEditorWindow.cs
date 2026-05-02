@@ -471,7 +471,7 @@ public class ActionEventEditorWindow : EditorWindow
             Type type = comp.GetType();
             foreach (var field in type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
-                if (field.Name == "ActionEvents")
+                if (field.Name is nameof(ActionEventHostBlockBase.ActionEvents) or nameof(DoorComponent.DoorType))
                     continue;
                 displayOptions.Add($"{field.Name}");
                 propertyNames.Add(field.Name);
@@ -552,57 +552,57 @@ public class ActionEventEditorWindow : EditorWindow
                 else
                     colorStr = string.Format(CultureInfo.InvariantCulture, "{0}:{1}:{2}:{3}", colorValue.r * 255f, colorValue.g * 255f, colorValue.b * 255f, colorValue.a);
                 if (valueProperty.stringValue != colorStr) valueProperty.stringValue = colorStr;
-            }
-            else if (type.IsEnum)
+        }
+        else if (type.IsEnum)
+        {
+            if (Attribute.IsDefined(type, typeof(FlagsAttribute)))
             {
-                if (Attribute.IsDefined(type, typeof(FlagsAttribute)))
+                Enum enumValue;
+                try
                 {
-                    Enum enumValue;
-                    try
-                    {
-                        enumValue = (Enum)Enum.Parse(type, string.IsNullOrEmpty(valueProperty.stringValue) ? "0" : valueProperty.stringValue, true);
-                    }
-                    catch
-                    {
-                        enumValue = (Enum)Activator.CreateInstance(type);
-                    }
+                    enumValue = (Enum)Enum.Parse(type, string.IsNullOrEmpty(valueProperty.stringValue) ? "0" : valueProperty.stringValue, true);
+                }
+                catch
+                {
+                    enumValue = (Enum)Activator.CreateInstance(type);
+                }
 
-                    enumValue = EditorGUI.EnumFlagsField(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), "Value", enumValue);
-                    string newEnumStr = enumValue.ToString();
-                    if (valueProperty.stringValue != newEnumStr) valueProperty.stringValue = newEnumStr;
-                }
-                else
-                {
-                    string[] names = Enum.GetNames(type);
-                    int idx = System.Array.IndexOf(names, valueProperty.stringValue);
-                    if (idx < 0) idx = 0;
-                    idx = EditorGUI.Popup(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), "Value", idx, names);
-                    if (names.Length > 0)
-                    {
-                        string newEnumName = names[idx];
-                        if (valueProperty.stringValue != newEnumName) valueProperty.stringValue = newEnumName;
-                    }
-                }
+                enumValue = EditorGUI.EnumFlagsField(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), "Value", enumValue);
+                string newEnumStr = enumValue.ToString();
+                if (valueProperty.stringValue != newEnumStr) valueProperty.stringValue = newEnumStr;
             }
-            else if (type == typeof(SerializableVector) || type == typeof(Vector3))
+            else
             {
-                Vector3 vecValue = Vector3.zero;
-                if (!string.IsNullOrEmpty(valueProperty.stringValue))
+                string[] names = Enum.GetNames(type);
+                int idx = System.Array.IndexOf(names, valueProperty.stringValue);
+                if (idx < 0) idx = 0;
+                idx = EditorGUI.Popup(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), "Value", idx, names);
+                if (names.Length > 0)
                 {
-                    var parts = valueProperty.stringValue.Split(':');
-                    if (parts.Length >= 2)
-                    {
-                        float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float px);
-                        float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float py);
-                        float pz = 0f;
-                        if (parts.Length >= 3) float.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out pz);
-                        vecValue = new Vector3(px, py, pz);
-                    }
+                    string newEnumName = names[idx];
+                    if (valueProperty.stringValue != newEnumName) valueProperty.stringValue = newEnumName;
                 }
-                vecValue = EditorGUI.Vector3Field(new Rect(x, y, width-100, EditorGUIUtility.singleLineHeight), new GUIContent("Value"), vecValue);
-                string newVecStr = string.Format(CultureInfo.InvariantCulture, "{0}:{1}:{2}", vecValue.x, vecValue.y, vecValue.z);
-                if (valueProperty.stringValue != newVecStr) valueProperty.stringValue = newVecStr;
             }
+        }
+        else if (type == typeof(SerializableVector) || type == typeof(Vector3))
+        {
+            Vector3 vecValue = Vector3.zero;
+            if (!string.IsNullOrEmpty(valueProperty.stringValue))
+            {
+                var parts = valueProperty.stringValue.Split(':');
+                if (parts.Length >= 2)
+                {
+                    float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float px);
+                    float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float py);
+                    float pz = 0f;
+                    if (parts.Length >= 3) float.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out pz);
+                    vecValue = new Vector3(px, py, pz);
+                }
+            }
+            vecValue = EditorGUI.Vector3Field(new Rect(x, y, width-100, EditorGUIUtility.singleLineHeight), new GUIContent("Value"), vecValue);
+            string newVecStr = string.Format(CultureInfo.InvariantCulture, "{0}:{1}:{2}", vecValue.x, vecValue.y, vecValue.z);
+            if (valueProperty.stringValue != newVecStr) valueProperty.stringValue = newVecStr;
+        }
         else
         {
             EditorGUI.PropertyField(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), valueProperty, new GUIContent("Value"));
