@@ -265,12 +265,12 @@ public static class SchematicClusterOptimizer
     private static void ApplyBounds(Transform clusterTransform, Transform schematicRoot, Bounds clusterLocalBounds)
     {
         // Add padding to ensure all objects fit with safety margin
-        // Vector3 padding = new(
-        //     Mathf.Max(clusterLocalBounds.size.x * 0.1f, 0.2f),
-        //     Mathf.Max(clusterLocalBounds.size.y * 0.1f, 0.2f),
-        //     Mathf.Max(clusterLocalBounds.size.z * 0.1f, 0.2f));
+        Vector3 padding = new(
+            Mathf.Max(clusterLocalBounds.size.x * 0.1f, 0.2f),
+            Mathf.Max(clusterLocalBounds.size.y * 0.1f, 0.2f),
+            Mathf.Max(clusterLocalBounds.size.z * 0.1f, 0.2f));
 
-        Vector3 worldSize = clusterLocalBounds.size;
+        Vector3 worldSize = clusterLocalBounds.size + padding * 2f;
         worldSize = new(
             Mathf.Max(worldSize.x, 0.001f),
             Mathf.Max(worldSize.y, 0.001f),
