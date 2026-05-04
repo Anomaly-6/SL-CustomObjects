@@ -1,8 +1,11 @@
-public enum ActionType : byte
+namespace DONT_TOUCH.Enums
 {
-    Command,
-    Animation,
-    Audio,
-    SetComponentProperty,
-    Destroy
+    public enum ActionType : byte
+    {
+        Command,
+        Animation,
+        Audio,
+        SetComponentProperty,
+        Destroy
+    }
 }

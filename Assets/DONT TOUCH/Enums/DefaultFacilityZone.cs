@@ -1,9 +1,12 @@
-﻿public enum DefaultFacilityZone
+﻿namespace DONT_TOUCH.Enums
 {
-    None,
-    LightContainment,
-    HeavyContainment,
-    Entrance,
-    Surface,
-    Other,
+    public enum DefaultFacilityZone
+    {
+        None,
+        LightContainment,
+        HeavyContainment,
+        Entrance,
+        Surface,
+        Other,
+    }
 }

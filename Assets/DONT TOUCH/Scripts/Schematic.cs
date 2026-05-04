@@ -2,6 +2,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using DONT_TOUCH.Enums;
+using DONT_TOUCH.Scripts;
+using DONT_TOUCH.Scripts.BlockSerialization;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,6 +14,11 @@ using UnityEngine;
 public class Schematic : SchematicBlock
 {
     public override BlockType BlockType => BlockType.Schematic;
+    [SerializeField] private SchematicClusterOptimizerSettings clusterOptimizer = new();
+
+    public SchematicClusterOptimizerSettings ClusterOptimizer => clusterOptimizer;
+
+    public int OptimizeClusters() => SchematicClusterOptimizer.Optimize(this);
 
     public void CompileSchematic()
     {

@@ -14,7 +14,7 @@ public class SchematicManager : EditorWindow
 
     static SchematicManager()
     {
-        EditorApplication.playModeStateChanged += LogPlayModeState;
+        // EditorApplication.playModeStateChanged += LogPlayModeState;
 
         ConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "config.json");
         Config = File.Exists(ConfigPath) ? JsonConvert.DeserializeObject<Config>(File.ReadAllText(ConfigPath)) : new Config();
@@ -47,24 +47,24 @@ public class SchematicManager : EditorWindow
         System.Diagnostics.Process.Start(Config.ExportPath);
     }
 
-    private static void LogPlayModeState(PlayModeStateChange state)
-    {
-        if (state != PlayModeStateChange.EnteredPlayMode)
-            return;
+    // private static void LogPlayModeState(PlayModeStateChange state)
+    // {
+    //     if (state != PlayModeStateChange.EnteredPlayMode)
+    //         return;
 
-        ModifierBase[] modifiers = FindObjectsOfType<ModifierBase>();
-        if (modifiers.Length > 0)
-        {
-            foreach (ModifierBase modifierBase in modifiers)
-            {
-                modifierBase.Apply = false;
-                modifierBase.ApplyModifier();
-                DestroyImmediate(modifierBase);
-            }
-        }
+    //     ModifierBase[] modifiers = FindObjectsOfType<ModifierBase>();
+    //     if (modifiers.Length > 0)
+    //     {
+    //         foreach (ModifierBase modifierBase in modifiers)
+    //         {
+    //             modifierBase.Apply = false;
+    //             modifierBase.ApplyModifier();
+    //             DestroyImmediate(modifierBase);
+    //         }
+    //     }
 
-        CompileAll();
-    }
+    //     CompileAll();
+    // }
 
     private static void CompileAll()
     {

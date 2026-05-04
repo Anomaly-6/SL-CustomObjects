@@ -1,15 +1,20 @@
-﻿namespace DONT_TOUCH.Scripts.Editors
-{
-    using System.Collections.Generic;
-    using UnityEditor;
-    using UnityEngine;
+﻿using System.Collections.Generic;
+using DONT_TOUCH.Scripts.BlockComponents;
+using UnityEditor;
+using UnityEngine;
 
+namespace DONT_TOUCH.Scripts.Editors
+{
     [CustomEditor(typeof(Schematic))]
     public class SchematicEditor : Editor
     {
         public override void OnInspectorGUI()
         {
             Schematic schematic = (Schematic)target;
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("clusterOptimizer"), true);
+            serializedObject.ApplyModifiedProperties();
 
             GUILayout.Label($"<color=white>Number of blocks: <b>{schematic.GetComponentsInChildren<SchematicBlock>().Length - 1}</b></color>", SchematicManager.UnityRichTextStyle);
 
@@ -31,6 +36,17 @@
                     i > 0
                         ? $"<color=#00FF00>Successfully applied scale to <b>{i}</b> empties!</color>"
                         : "<color=#FFFF00>No empties have been found to which scale could be applied to.</color>");
+
+                return;
+            }
+
+            if (GUILayout.Button("Optimize Clusters"))
+            {
+                int optimized = schematic.OptimizeClusters();
+                Debug.Log(
+                    optimized > 0
+                        ? $"<color=#00FF00>Successfully created <b>{optimized}</b> culling clusters!</color>"
+                        : "<color=#FFFF00>No eligible objects were found for clustering.</color>");
 
                 return;
             }

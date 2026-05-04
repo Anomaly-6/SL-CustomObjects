@@ -1,20 +1,23 @@
-/// <summary>
-/// Represents all the valid collider shapes.
-/// </summary>
-public enum ColliderShape
+namespace DONT_TOUCH.Enums
 {
 	/// <summary>
-	/// Box collider shape.
+	/// Represents all the valid collider shapes.
 	/// </summary>
-	Box,
+	public enum ColliderShape
+	{
+		/// <summary>
+		/// Box collider shape.
+		/// </summary>
+		Box,
 
-	/// <summary>
-	/// Sphere collider shape.
-	/// </summary>
-	Sphere,
+		/// <summary>
+		/// Sphere collider shape.
+		/// </summary>
+		Sphere,
 
-	/// <summary>
-	/// Capsule collider shape.
-	/// </summary>
-	Capsule,
+		/// <summary>
+		/// Capsule collider shape.
+		/// </summary>
+		Capsule,
+	}
 }

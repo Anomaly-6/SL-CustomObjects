@@ -1,8 +1,11 @@
-public enum CameraType
+namespace DONT_TOUCH.Enums
 {
-	Lcz = 0,
-	Hcz = 1,
-	Ez = 2,
-	EzArm = 3,
-	Sz = 4
+	public enum CameraType
+	{
+		Lcz = 0,
+		Hcz = 1,
+		Ez = 2,
+		EzArm = 3,
+		Sz = 4
+	}
 }

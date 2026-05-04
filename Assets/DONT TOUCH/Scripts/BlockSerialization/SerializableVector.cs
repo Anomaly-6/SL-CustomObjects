@@ -20,6 +20,13 @@ public class SerializableVector
         this.z = z;
     }
 
+    public SerializableVector(Vector3 vector)
+    {
+        this.x = vector.x;
+        this.y = vector.y;
+        this.z = vector.z;
+    }
+
     public float x { get; set; }
 
     public float y { get; set; }

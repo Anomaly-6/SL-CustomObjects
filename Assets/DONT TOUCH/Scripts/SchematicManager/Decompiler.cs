@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DONT_TOUCH.Enums;
+using DONT_TOUCH.Scripts;
+using DONT_TOUCH.Scripts.BlockComponents;
+using DONT_TOUCH.Scripts.BlockComponents.Locker;
+using DONT_TOUCH.Scripts.BlockSerialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -29,16 +34,16 @@ public static class Decompiler
 			Dict.Add(BlockType.Text, gameObject.AddComponent<TextComponent>());
 			Dict.Add(BlockType.Interactable, gameObject.AddComponent<InteractableComponent>());
 			Dict.Add(BlockType.Waypoint, gameObject.AddComponent<WaypointComponent>());
-			Dict.Add(BlockType.Door, gameObject.AddComponent<DoorComponent>());
-			Dict.Add(BlockType.Camera, gameObject.AddComponent<Scp079CameraComponent>());
-			Dict.Add(BlockType.ShootingTarget, gameObject.AddComponent<ShootingTargetComponent>());
-			Dict.Add(BlockType.PlayerSpawnPoint, gameObject.AddComponent<PlayerSpawnPointComponent>());
-			Dict.Add(BlockType.Capybara, gameObject.AddComponent<CapybaraComponent>());
-			Dict.Add(BlockType.PlayerBlocker, gameObject.AddComponent<PlayerBlockerComponent>());
-			Dict.Add(BlockType.CullingParent, gameObject.AddComponent<CullingParentComponent>());
-			Dict.Add(BlockType.MirrorPrefab, gameObject.AddComponent<MirrorPrefabComponent>());
-			Dict.Add(BlockType.Clutter, gameObject.AddComponent<ClutterComponent>());
-			Dict.Add(BlockType.Trigger, gameObject.AddComponent<TriggerComponent>());
+			Dict.Add(BlockType.Door, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.DoorComponent>());
+			Dict.Add(BlockType.Camera, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.Scp079CameraComponent>());
+			Dict.Add(BlockType.ShootingTarget, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.ShootingTargetComponent>());
+			Dict.Add(BlockType.PlayerSpawnPoint, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.PlayerSpawnPointComponent>());
+			Dict.Add(BlockType.Capybara, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.CapybaraComponent>());
+			Dict.Add(BlockType.PlayerBlocker, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.PlayerBlockerComponent>());
+			Dict.Add(BlockType.CullingParent, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.CullingParentComponent>());
+			Dict.Add(BlockType.MirrorPrefab, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.MirrorPrefabComponent>());
+			Dict.Add(BlockType.Clutter, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.ClutterComponent>());
+			Dict.Add(BlockType.Trigger, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.TriggerComponent>());
 			return this;
 		}
 	}

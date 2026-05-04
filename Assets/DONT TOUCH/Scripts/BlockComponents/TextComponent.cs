@@ -1,50 +1,55 @@
 using System;
 using System.Collections.Generic;
+using DONT_TOUCH.Enums;
+using DONT_TOUCH.Scripts.BlockSerialization;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 
-[ExecuteInEditMode]
-public class TextComponent : SchematicBlock
+namespace DONT_TOUCH.Scripts.BlockComponents
 {
-    public override BlockType BlockType => BlockType.Text;
-    [HideInInspector] public string Text;
-    [HideInInspector] public SerializableVector DisplaySize;
-    private TMP_Text _textMesh;
-    private MeshRenderer _renderer;
-
-    private void Start()
+    [ExecuteInEditMode]
+    public class TextComponent : SchematicBlock
     {
-        TryGetComponent(out _textMesh);
-        TryGetComponent(out _renderer);
-    }
+        public override BlockType BlockType => BlockType.Text;
+        [HideInInspector] public string Text;
+        [HideInInspector] public SerializableVector DisplaySize;
+        private TMP_Text _textMesh;
+        private MeshRenderer _renderer;
 
-    private void Update()
-    {
-        _textMesh.margin = Vector4.zero;
-        _renderer.hideFlags = HideFlags.HideInInspector;
-    }
-
-    public override void Compile(SchematicBlockData block)
-    {
-        block.Properties = new Dictionary<string, object>
+        private void Start()
         {
-            { "Text", _textMesh.text },
-            { "DisplaySize", (SerializableVector)_textMesh.rectTransform.sizeDelta }
-        };
+            TryGetComponent(out _textMesh);
+            TryGetComponent(out _renderer);
+        }
 
-        base.Compile(block);
-    }
+        private void Update()
+        {
+            _textMesh.margin = Vector4.zero;
+            _renderer.hideFlags = HideFlags.HideInInspector;
+        }
 
-    public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
-    {
-        TMP_Text text = Create<GameObject>("Assets/Resources/Blocks/Text.prefab").GetComponent<TMP_Text>();
-        gameObject = text.gameObject;
+        public override void Compile(SchematicBlockData block)
+        {
+            block.Properties = new Dictionary<string, object>
+            {
+                { "Text", _textMesh.text },
+                { "DisplaySize", (SerializableVector)_textMesh.rectTransform.sizeDelta }
+            };
 
-        text.text = Convert.ToString(block.Properties["Text"]);
-        text.rectTransform.sizeDelta =
-            JsonConvert.DeserializeObject<Vector2>(block.Properties["DisplaySize"].ToString());
+            base.Compile(block);
+        }
 
-        base.Decompile(ref gameObject, block, parent);
+        public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
+        {
+            TMP_Text text = Create<GameObject>("Assets/Resources/Blocks/Text.prefab").GetComponent<TMP_Text>();
+            gameObject = text.gameObject;
+
+            text.text = Convert.ToString(block.Properties["Text"]);
+            text.rectTransform.sizeDelta =
+                JsonConvert.DeserializeObject<Vector2>(block.Properties["DisplaySize"].ToString());
+
+            base.Decompile(ref gameObject, block, parent);
+        }
     }
 }

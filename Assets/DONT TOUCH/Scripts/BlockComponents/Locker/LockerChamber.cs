@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
+using DONT_TOUCH.Enums;
 
-[System.Serializable]
-public class LockerChamber
+namespace DONT_TOUCH.Scripts.BlockComponents.Locker
 {
-    public List<ItemType> AcceptableItems;
-    public bool IsOpen;
-    public DoorPermissionFlags RequiredPermissions;
+    [System.Serializable]
+    public class LockerChamber
+    {
+        public List<ItemType> AcceptableItems;
+        public bool IsOpen;
+        public DoorPermissionFlags RequiredPermissions;
+    }
 }

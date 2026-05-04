@@ -1,4 +1,6 @@
-﻿namespace DONT_TOUCH.Scripts.Modifiers
+﻿using DONT_TOUCH.Scripts.BlockComponents;
+
+namespace DONT_TOUCH.Scripts.Modifiers
 {
     using UnityEngine;
 

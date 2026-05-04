@@ -1,6 +1,9 @@
-public enum TargetType
+namespace DONT_TOUCH.Enums
 {
-	Sport = 0,
-	ClassD = 1,
-	Binary = 2
+	public enum TargetType
+	{
+		Sport = 0,
+		ClassD = 1,
+		Binary = 2
+	}
 }

@@ -1,7 +1,10 @@
-﻿[System.Flags]
-public enum LockOnEvent
+﻿namespace DONT_TOUCH.Enums
 {
-    None = 0,
-    LightDecontaminated = 1,
-    WarheadDetonated = 2,
+    [System.Flags]
+    public enum LockOnEvent
+    {
+        None = 0,
+        LightDecontaminated = 1,
+        WarheadDetonated = 2,
+    }
 }

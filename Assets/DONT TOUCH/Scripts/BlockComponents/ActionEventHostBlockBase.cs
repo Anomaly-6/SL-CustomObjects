@@ -1,43 +1,47 @@
 using System.Collections.Generic;
+using DONT_TOUCH.Scripts.BlockSerialization;
 
-public abstract class ActionEventHostBlockBase : SchematicBlock, IActionEventHost
+namespace DONT_TOUCH.Scripts.BlockComponents
 {
-    public List<ActionEventList> ActionEvents = new();
-
-    List<ActionEventList> IActionEventHost.ActionEvents
+    public abstract class ActionEventHostBlockBase : SchematicBlock, IActionEventHost
     {
-        get => ActionEvents;
-        set => ActionEvents = value;
-    }
+        public List<ActionEventList> ActionEvents = new();
 
-    public abstract List<ActionEventList> CreateDefaultActionEvents();
-    void IActionEventHost.EnsureActionEventsInitialized() => EnsureActionEventsInitialized();
+        List<ActionEventList> IActionEventHost.ActionEvents
+        {
+            get => ActionEvents;
+            set => ActionEvents = value;
+        }
 
-    protected void PrepareActionEventsForCompile()
-    {
-        ActionEventSerialization.PrepareHostForCompile(this);
-    }
+        public abstract List<ActionEventList> CreateDefaultActionEvents();
+        void IActionEventHost.EnsureActionEventsInitialized() => EnsureActionEventsInitialized();
 
-    protected void ReadActionEventsFromProperties(Dictionary<string, object> properties, string key = nameof(ActionEvents))
-    {
-        ActionEventSerialization.ReadHostEventListsFromProperties(this, properties, key);
-    }
+        protected void PrepareActionEventsForCompile()
+        {
+            ActionEventSerialization.PrepareHostForCompile(this);
+        }
 
-    protected void EnsureActionEventsInitialized()
-    {
-        if (ActionEvents == null || ActionEvents.Count == 0)
-            ActionEvents = CreateDefaultActionEvents();
+        protected void ReadActionEventsFromProperties(Dictionary<string, object> properties, string key = nameof(ActionEvents))
+        {
+            ActionEventSerialization.ReadHostEventListsFromProperties(this, properties, key);
+        }
 
-        ActionEventSerialization.EnsureEventLists(ActionEvents);
-    }
+        protected void EnsureActionEventsInitialized()
+        {
+            if (ActionEvents == null || ActionEvents.Count == 0)
+                ActionEvents = CreateDefaultActionEvents();
 
-    protected virtual void Reset()
-    {
-        EnsureActionEventsInitialized();
-    }
+            ActionEventSerialization.EnsureEventLists(ActionEvents);
+        }
 
-    protected virtual void OnValidate()
-    {
-        EnsureActionEventsInitialized();
+        protected virtual void Reset()
+        {
+            EnsureActionEventsInitialized();
+        }
+
+        protected virtual void OnValidate()
+        {
+            EnsureActionEventsInitialized();
+        }
     }
 }

@@ -1,32 +1,38 @@
 using System;
+using DONT_TOUCH.Enums;
+using DONT_TOUCH.Scripts.BlockSerialization;
 using UnityEngine;
 
-[ExecuteInEditMode, SelectionBase]
-public class WaypointComponent : SchematicBlock
+namespace DONT_TOUCH.Scripts
 {
-	public override BlockType BlockType => BlockType.Waypoint;
+    [ExecuteInEditMode, SelectionBase]
 
-	public override void Compile(SchematicBlockData block) => base.Compile(block);
+    public class WaypointComponent : SchematicBlock
+    {
+        public override BlockType BlockType => BlockType.Waypoint;
 
-	public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
-	{
-		gameObject = Create<GameObject>("Assets/Resources/Blocks/Waypoint.prefab");
-		base.Decompile(ref gameObject, block, parent);
-	}
+        public override void Compile(SchematicBlockData block) => base.Compile(block);
 
-	private void Start()
-	{
-		TryGetComponent(out _filter);
-		TryGetComponent(out _renderer);
-	}
+        public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
+        {
+            gameObject = Create<GameObject>("Assets/Resources/Blocks/Waypoint.prefab");
+            base.Decompile(ref gameObject, block, parent);
+        }
 
-	private void Update()
-	{
-		_filter.hideFlags = HideFlags.HideInInspector;
-		_renderer.hideFlags = HideFlags.HideInInspector;
-	}
+        private void Start()
+        {
+            TryGetComponent(out _filter);
+            TryGetComponent(out _renderer);
+        }
 
-	private MeshFilter _filter;
-	private MeshRenderer _renderer;
+        private void Update()
+        {
+            _filter.hideFlags = HideFlags.HideInInspector;
+            _renderer.hideFlags = HideFlags.HideInInspector;
+        }
 
+        private MeshFilter _filter;
+        private MeshRenderer _renderer;
+
+    }
 }
