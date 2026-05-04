@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using DONT_TOUCH.Enums;
 using DONT_TOUCH.Scripts;
+using DONT_TOUCH.Scripts.BlockComponents;
 using DONT_TOUCH.Scripts.BlockSerialization;
 using UnityEditor;
 using UnityEngine;

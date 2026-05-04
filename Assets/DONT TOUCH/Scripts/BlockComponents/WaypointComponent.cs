@@ -1,5 +1,6 @@
 using System;
 using DONT_TOUCH.Enums;
+using DONT_TOUCH.Scripts.BlockComponents;
 using DONT_TOUCH.Scripts.BlockSerialization;
 using UnityEngine;
 

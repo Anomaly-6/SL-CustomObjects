@@ -1,4 +1,5 @@
 using DONT_TOUCH.Scripts;
+using DONT_TOUCH.Scripts.BlockComponents;
 using UnityEditor;
 using UnityEngine;
 

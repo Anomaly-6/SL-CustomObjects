@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace DONT_TOUCH.Scripts
+namespace DONT_TOUCH.Scripts.BlockComponents
 {
     public abstract class SchematicBlock : MonoBehaviour
     {
