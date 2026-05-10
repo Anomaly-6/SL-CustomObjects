@@ -13,7 +13,8 @@ namespace DONT_TOUCH.Scripts.BlockComponents
         public PrimitiveType Type;
 
         public override BlockType BlockType => BlockType.Trigger;
-
+        public TriggerTargetType TargetType;
+        
         internal MeshFilter _filter;
         private MeshRenderer _renderer;
         private Material _sharedTransparent;
@@ -27,6 +28,7 @@ namespace DONT_TOUCH.Scripts.BlockComponents
             {
                 { "PrimitiveType", Type },
                 { nameof(ActionEvents), ActionEvents },
+                { "TargetType", TargetType },
             };
 
             base.Compile(block);
@@ -39,8 +41,11 @@ namespace DONT_TOUCH.Scripts.BlockComponents
             gameObject = trigger.gameObject;
 
             trigger.Type = (PrimitiveType)Convert.ToInt32(block.Properties["PrimitiveType"]);
-
             trigger.ReadActionEventsFromProperties(block.Properties, nameof(ActionEvents));
+            if (block.Properties.TryGetValue("TargetType", out var targetType))
+            {
+                trigger.TargetType = (TriggerTargetType)Convert.ToInt32(targetType);
+            }
 
             base.Decompile(ref gameObject, block, parent);
         }

@@ -5,7 +5,6 @@ using UnityEngine;
 namespace DONT_TOUCH.Scripts.Editors
 {
     [CustomEditor(typeof(TriggerComponent))]
-
     public class TriggerComponentEditor : Editor
     {
         public override void OnInspectorGUI()

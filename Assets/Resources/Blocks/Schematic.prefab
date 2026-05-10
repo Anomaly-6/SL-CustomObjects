@@ -44,3 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3533e02e7d920b94c92769b55192eee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MovementSmoothing: 60
+  clusterOptimizer:
+    ExcludedBlockTypes: 05000000240000001e000000090000002700000021000000030000000a0000002300000002000000
+    MaxDistanceForPrimitiveCluster: 2.5
+    MaxPrimitivesPerCluster: 100
+    MinimumSizeBeforeBeingBigPrimitive: 10
