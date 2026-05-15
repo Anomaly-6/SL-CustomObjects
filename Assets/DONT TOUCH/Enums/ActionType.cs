@@ -1,6 +1,6 @@
 namespace DONT_TOUCH.Enums
 {
-    public enum ActionType : byte
+    public enum ActionType
     {
         Command = 0,
         Animation = 1,

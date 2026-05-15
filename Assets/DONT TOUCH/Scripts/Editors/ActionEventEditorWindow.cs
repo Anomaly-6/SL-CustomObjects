@@ -255,7 +255,7 @@ namespace DONT_TOUCH.Scripts.Editors
             actionsProperty.InsertArrayElementAtIndex(index);
 
             SerializedProperty element = actionsProperty.GetArrayElementAtIndex(index);
-            element.FindPropertyRelative(nameof(ActionGame.Type)).enumValueIndex = (int)ActionType.Command;
+            element.FindPropertyRelative(nameof(ActionGame.Type)).intValue = (int)ActionType.Command;
             element.FindPropertyRelative(nameof(ActionGame.ActionDelay)).floatValue = 0;
             element.FindPropertyRelative(nameof(ActionGame.Value)).stringValue = string.Empty;
             element.FindPropertyRelative(nameof(ActionGame.Param)).stringValue = string.Empty;
@@ -286,7 +286,7 @@ namespace DONT_TOUCH.Scripts.Editors
             }
 
             SerializedProperty typeProperty = element.FindPropertyRelative(nameof(ActionGame.Type));
-            ActionType actionType = (ActionType)typeProperty.enumValueIndex;
+            ActionType actionType = (ActionType)typeProperty.intValue;
 
             height += LineWithSpacing();
             height += LineWithSpacing();
@@ -345,7 +345,7 @@ namespace DONT_TOUCH.Scripts.Editors
             SerializedProperty expandedProperty = element.FindPropertyRelative(nameof(ActionGame.EditorIsExpanded));
             SerializedProperty nameProperty = element.FindPropertyRelative(nameof(ActionGame.Name));
 
-            ActionType actionType = (ActionType)typeProperty.enumValueIndex;
+            ActionType actionType = (ActionType)typeProperty.intValue;
             float y = rect.y + InnerPadding;
 
             bool isExpanded = expandedProperty == null || expandedProperty.boolValue;
