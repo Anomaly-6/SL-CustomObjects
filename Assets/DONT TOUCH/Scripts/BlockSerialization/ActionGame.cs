@@ -31,7 +31,6 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
             switch (Type)
             {
                 case ActionType.Command:
-                case ActionType.Audio:
                     // Command и Audio используют Value, остальное очищаем
                     TargetId = 0;
                     Param = string.Empty;

@@ -390,7 +390,7 @@ namespace DONT_TOUCH.Scripts.Editors
                 actionDelayProperty);
             y += LineWithSpacing();
 
-            if (actionType == ActionType.Command || actionType == ActionType.Audio)
+            if (actionType == ActionType.Command)
             {
                 if (paramTypeProperty.intValue != 0) paramTypeProperty.intValue = 0;
                 EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight),
@@ -490,23 +490,21 @@ namespace DONT_TOUCH.Scripts.Editors
             List<string> displayOptions = new List<string>();
             List<string> propertyNames = new List<string>();
             List<Type> propertyTypes = new List<Type>();
-
-            foreach (var comp in target.GetComponents<SchematicBlock>())
+            
+            var comp = target.GetComponent<SchematicBlock>();
+            Type type = comp.GetType();
+            foreach (var field in type.GetFields(System.Reflection.BindingFlags.Public |
+                                                 System.Reflection.BindingFlags.Instance))
             {
-                if (comp == null) continue;
-
-                Type type = comp.GetType();
-                foreach (var field in type.GetFields(System.Reflection.BindingFlags.Public |
-                                                     System.Reflection.BindingFlags.Instance))
-                {
-                    if (field.Name is nameof(ActionEventHostBlockBase.ActionEvents) or nameof(DoorComponent.DoorType))
-                        continue;
-                    displayOptions.Add($"{field.Name}");
-                    propertyNames.Add(field.Name);
-                    propertyTypes.Add(field.FieldType);
-                }
+                if (field.Name is nameof(ActionEventHostBlockBase.ActionEvents) or nameof(DoorComponent.DoorType))
+                    continue;
+                displayOptions.Add($"{field.Name}");
+                propertyNames.Add(field.Name);
+                propertyTypes.Add(field.FieldType);
             }
-
+            displayOptions.Add("Play");
+            propertyNames.Add("Play");
+            propertyTypes.Add(typeof(object));
             if (displayOptions.Count == 0)
             {
                 EditorGUI.PropertyField(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), paramProperty,
@@ -655,10 +653,14 @@ namespace DONT_TOUCH.Scripts.Editors
                     vecValue.z);
                 if (valueProperty.stringValue != newVecStr) valueProperty.stringValue = newVecStr;
             }
-            else
+            else if (type == typeof(string))
             {
                 EditorGUI.PropertyField(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), valueProperty,
                     new GUIContent("Value"));
+            }
+            else
+            {
+                EditorGUI.LabelField(new Rect(x, y, width, EditorGUIUtility.singleLineHeight), new GUIContent("Value"));
             }
 
             y += LineWithSpacing();
@@ -821,7 +823,6 @@ namespace DONT_TOUCH.Scripts.Editors
             {
                 ActionType.Command => "console.infoicon.sml",
                 ActionType.Animation => "Animation Icon",
-                ActionType.Audio => "AudioSource Icon",
                 ActionType.Destroy => "d_console.erroricon.sml",
                 _ => "FilterByType",
             };

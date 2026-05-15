@@ -23,5 +23,6 @@
         MirrorPrefab = 37,
         Clutter = 38,
         Trigger = 39,
+        AudioPlayer = 40,
     }
 }

@@ -41,7 +41,6 @@ namespace DONT_TOUCH.Scripts.Editors
                 "console.infoicon.sml",
                 "<b>Command:</b> вызывает команду в админ панели игры.",
                 "<b>Animation:</b> изменяет параметры анимации.",
-                "<b>Audio:</b> включает указанный звук. (нужно указать имя файла) (WIP)",
                 "<b>Set Component Property:</b> взаимодействие с другими объектами",
                 "<b>Destroy:</b> удаление объекта"),
 

@@ -200,6 +200,10 @@ public class RightClickMenuExtended
 	[MenuItem("GameObject/🛠️ MER Blocks/Trigger", false, -1)]
 	private static void CreateTrigger(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/Trigger.prefab");
 
+	[MenuItem("GameObject/🛠️ MER Blocks/AudioPlayer", false, -1)]
+	private static void CreateAudioPlayer(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/AudioPlayer.prefab");
+
+	
 	private static void CreateBlock(MenuCommand menuCommand, string prefabPath)
 	{
 		GameObject instance = SchematicBlock.Create<GameObject>(prefabPath);

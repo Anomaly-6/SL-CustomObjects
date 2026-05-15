@@ -44,6 +44,7 @@ public static class Decompiler
 			Dict.Add(BlockType.MirrorPrefab, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.MirrorPrefabComponent>());
 			Dict.Add(BlockType.Clutter, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.ClutterComponent>());
 			Dict.Add(BlockType.Trigger, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.TriggerComponent>());
+			Dict.Add(BlockType.AudioPlayer, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.AudioPlayerComponent>());
 			return this;
 		}
 	}
