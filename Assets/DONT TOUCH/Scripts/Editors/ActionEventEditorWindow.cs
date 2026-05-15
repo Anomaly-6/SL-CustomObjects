@@ -5,9 +5,11 @@ using DONT_TOUCH.Enums;
 using DONT_TOUCH.Scripts.BlockComponents;
 using DONT_TOUCH.Scripts.BlockSerialization;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditorInternal;
 using UnityEngine;
 using AnimatorController = UnityEditor.Animations.AnimatorController;
+using AnimatorControllerLayer = UnityEditor.Animations.AnimatorControllerLayer;
 using AnimatorParameter = UnityEngine.AnimatorControllerParameter;
 using AnimatorParameterType = UnityEngine.AnimatorControllerParameterType;
 
@@ -299,14 +301,16 @@ namespace DONT_TOUCH.Scripts.Editors
                 height += LineWithSpacing();
 
                 Animator animator = GetAnimator(targetProperty.objectReferenceValue as GameObject);
-                AnimatorParameter[] parameters = GetAnimatorParameters(animator);
-                if (animator == null || parameters.Length == 0)
+                
+                if (animator == null)
                 {
                     height += HelpBoxHeight + RowSpacing;
                 }
                 else if (ShouldShowAnimationValueField(animator, paramProperty.stringValue))
                 {
                     height += LineWithSpacing();
+                    if (((AnimatorController)animator.runtimeAnimatorController).layers.Length == 0)
+                        height += HelpBoxHeight + RowSpacing;
                 }
             }
             else if (actionType == ActionType.SetComponentProperty)
@@ -439,19 +443,13 @@ namespace DONT_TOUCH.Scripts.Editors
             AnimatorParameter[] parameters = GetAnimatorParameters(animator);
             if (parameters.Length == 0)
             {
-                if (paramProperty.stringValue != string.Empty) paramProperty.stringValue = string.Empty;
                 if (paramTypeProperty.intValue != 0) paramTypeProperty.intValue = 0;
                 if (valueProperty.stringValue != string.Empty) valueProperty.stringValue = string.Empty;
-                RuntimeAnimatorController controller = animator.runtimeAnimatorController;
-                string controllerName = controller != null ? controller.name : "None";
-                EditorGUI.HelpBox(
-                    new Rect(rect.x, y, rect.width, HelpBoxHeight),
-                    $"Animator has no parameters. Controller: {controllerName}",
-                    UnityEditor.MessageType.Info);
-                return;
             }
 
-            DrawParameterPopup(paramProperty, parameters, rect.x, y, rect.width);
+            var allStateNames = GetAllStateNames(animator.runtimeAnimatorController as AnimatorController);
+
+            DrawParameterPopup(paramProperty, parameters, allStateNames, rect.x, y, rect.width);
             y += LineWithSpacing();
 
             if (!TryGetAnimatorParamType(animator, paramProperty.stringValue, out AnimatorParameterType parameterType))
@@ -467,6 +465,12 @@ namespace DONT_TOUCH.Scripts.Editors
             }
 
             DrawAnimationValueField(parameterType, valueProperty, ref y, rect.x, rect.width);
+            
+            if (animator.runtimeAnimatorController is AnimatorController controller && controller.layers.Length == 0)
+            {
+                EditorGUI.HelpBox(new Rect(rect.x, y, rect.width, HelpBoxHeight),
+                    "Animator loaded from JSON. Only parameter modification is available.\n(May contain bugs. Load animations directly from Assets instead of from a pre-built schematic.)", UnityEditor.MessageType.Warning);
+            }
         }
 
         private static void DrawComponentPropertySelection(SerializedProperty paramProperty,
@@ -660,15 +664,22 @@ namespace DONT_TOUCH.Scripts.Editors
             y += LineWithSpacing();
         }
 
-        private static void DrawParameterPopup(SerializedProperty paramProperty, AnimatorParameter[] parameters,
+        private static void DrawParameterPopup(SerializedProperty paramProperty, AnimatorParameter[] parameters, List<string> allStateNames,
             float x, float y, float width)
         {
-            string[] options = new string[parameters.Length + 2];
+            string[] options = new string[allStateNames.Count + parameters.Length + 2];
             for (int i = 0; i < parameters.Length; i++)
-                options[i] = parameters[i].name;
+            {
+                options[i] = $"Parameters/{parameters[i].name}";
+            }
 
-            options[parameters.Length] = "Pause";
-            options[parameters.Length + 1] = "Resume";
+            for (int i = 0; i < allStateNames.Count; i++)
+            {
+                options[parameters.Length + i] = $"Animation/{allStateNames[i]}";
+            }
+            
+            options[parameters.Length + allStateNames.Count] = "Pause";
+            options[parameters.Length + allStateNames.Count + 1] = "Resume";
 
             int selectedIndex = System.Array.IndexOf(options, paramProperty.stringValue);
             if (selectedIndex < 0)
@@ -744,17 +755,20 @@ namespace DONT_TOUCH.Scripts.Editors
                    parameterType != AnimatorParameterType.Trigger;
         }
 
-        private static bool TryGetAnimatorParamType(Animator animator, string parameterName,
+        private static bool TryGetAnimatorParamType(Animator animator, string targetName,
             out AnimatorParameterType parameterType)
         {
             parameterType = AnimatorParameterType.Trigger;
 
-            if (animator == null || string.IsNullOrEmpty(parameterName))
+            if (animator == null || string.IsNullOrEmpty(targetName))
                 return false;
 
+            var split = targetName.Split('/');
+            if (split.Length < 2)
+                return false;
             foreach (AnimatorParameter parameter in GetAnimatorParameters(animator))
             {
-                if (parameter.name != parameterName)
+                if (parameter.name != split[1])
                     continue;
 
                 parameterType = parameter.type;
@@ -818,6 +832,36 @@ namespace DONT_TOUCH.Scripts.Editors
         private static float LineWithSpacing()
         {
             return EditorGUIUtility.singleLineHeight + RowSpacing;
+        }
+        
+        private static List<string> GetAllStateNames(AnimatorController controller)
+        {
+            List<string> stateNames = new List<string>();
+            if (controller == null) 
+                return stateNames;
+
+            foreach (AnimatorControllerLayer layer in controller.layers)
+            {
+                if (layer.stateMachine != null)
+                    CollectStatesRecursive(layer.stateMachine, stateNames);
+            }
+
+            return stateNames;
+        }
+
+        private static void CollectStatesRecursive(AnimatorStateMachine stateMachine, List<string> collected)
+        {
+            foreach (ChildAnimatorState child in stateMachine.states)
+            {
+                if (child.state != null)
+                    collected.Add(child.state.name);
+            }
+
+            foreach (ChildAnimatorStateMachine childSM in stateMachine.stateMachines)
+            {
+                if (childSM.stateMachine != null)
+                    CollectStatesRecursive(childSM.stateMachine, collected);
+            }
         }
     }
 }
