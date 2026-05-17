@@ -4,63 +4,60 @@ using DONT_TOUCH.Enums;
 using DONT_TOUCH.Scripts.BlockSerialization;
 using UnityEngine;
 
-namespace DONT_TOUCH.Scripts.BlockComponents
+
+[ExecuteInEditMode, SelectionBase]
+public class PickupComponent : SchematicBlock
 {
-    [ExecuteInEditMode, SelectionBase]
-    public class PickupComponent : SchematicBlock
+    [Tooltip("The ItemType of this pickup.")]
+    public ItemType ItemType;
+
+    [Tooltip("Custom Item name/ID.")] public string CustomItem;
+
+    [Tooltip(
+        "Use the in-game RA command \"forceatt\" while holding a firearm to get the code.\nSet to -1 for random attachments.")]
+    public string AttachmentsCode;
+
+    [Tooltip("The chance (in %) for this pickup to spawn.")] [Range(0f, 100f)]
+    public float Chance = 100f;
+
+    [Tooltip("Number of times you can use the pickup before it dissappears.\nSet to -1 for no limit.")] [Min(-1)]
+    public int NumberOfUses = 1;
+
+    public override BlockType BlockType => BlockType.Pickup;
+
+    public override void Compile(SchematicBlockData block)
     {
-        [Tooltip("The ItemType of this pickup.")]
-        public ItemType ItemType;
-    
-        [Tooltip("Custom Item name/ID.")]
-        public string CustomItem;
-
-        [Tooltip("Use the in-game RA command \"forceatt\" while holding a firearm to get the code.\nSet to -1 for random attachments.")]
-        public string AttachmentsCode;
-
-        [Tooltip("The chance (in %) for this pickup to spawn.")]
-        [Range(0f, 100f)]
-        public float Chance = 100f;
-
-        [Tooltip("Number of times you can use the pickup before it dissappears.\nSet to -1 for no limit.")]
-        [Min(-1)]
-        public int NumberOfUses = 1;
-
-        public override BlockType BlockType => BlockType.Pickup;
-
-        public override void Compile(SchematicBlockData block)
+        block.Properties = new Dictionary<string, object>
         {
-            block.Properties = new Dictionary<string, object>
-            {
-                { "ItemType", ItemType },
-                { "CustomItem", CustomItem },
-                { "AttachmentsCode", AttachmentsCode },
-                { "Chance", Chance },
-                { "Uses", NumberOfUses },
-            };
+            { "ItemType", ItemType },
+            { "CustomItem", CustomItem },
+            { "AttachmentsCode", AttachmentsCode },
+            { "Chance", Chance },
+            { "Uses", NumberOfUses },
+        };
 
-            base.Compile(block);
-        }
+        base.Compile(block);
+    }
 
-        public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
-        {
-            PickupComponent pickupComponent = Create<PickupComponent>("Assets/Resources/Blocks/Pickup.prefab");
-            gameObject = pickupComponent.gameObject;
+    public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
+    {
+        PickupComponent pickupComponent = Create<PickupComponent>("Assets/Resources/Blocks/Pickup.prefab");
+        gameObject = pickupComponent.gameObject;
 
-            pickupComponent.ItemType = (ItemType)Convert.ToInt32(block.Properties["ItemType"]);
-            pickupComponent.CustomItem = block.Properties["CustomItem"].ToString();
-            pickupComponent.AttachmentsCode = block.Properties.TryGetValue("AttachmentsCode", out object attachmentsCode) ? attachmentsCode.ToString() : "-1";
-            pickupComponent.Chance = Convert.ToSingle(block.Properties["Chance"]);
-            pickupComponent.NumberOfUses = Convert.ToInt32(block.Properties["Uses"]);
+        pickupComponent.ItemType = (ItemType)Convert.ToInt32(block.Properties["ItemType"]);
+        pickupComponent.CustomItem = block.Properties["CustomItem"].ToString();
+        pickupComponent.AttachmentsCode = block.Properties.TryGetValue("AttachmentsCode", out object attachmentsCode)
+            ? attachmentsCode.ToString()
+            : "-1";
+        pickupComponent.Chance = Convert.ToSingle(block.Properties["Chance"]);
+        pickupComponent.NumberOfUses = Convert.ToInt32(block.Properties["Uses"]);
 
-            base.Decompile(ref gameObject, block, parent);
-        }
+        base.Decompile(ref gameObject, block, parent);
+    }
 
-        private void OnValidate()
-        {
-            if (!uint.TryParse(AttachmentsCode, out uint _))
-                AttachmentsCode = "-1";
-        }
+    private void OnValidate()
+    {
+        if (!uint.TryParse(AttachmentsCode, out uint _))
+            AttachmentsCode = "-1";
     }
 }
-
