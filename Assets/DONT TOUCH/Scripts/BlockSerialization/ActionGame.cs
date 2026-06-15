@@ -27,11 +27,11 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
             Param ??= string.Empty;
             ActionDelay = Mathf.Max(0f, ActionDelay);
 
-            // Очищаем параметры, не релевантные для текущего типа действия
+            // Clear parameters that are not relevant for the current action type
             switch (Type)
             {
                 case ActionType.Command:
-                    // Command и Audio используют Value, остальное очищаем
+                    // Command and Audio use Value, clear the rest
                     TargetId = 0;
                     Param = string.Empty;
                     ParamType = default;
@@ -39,13 +39,13 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
                     break;
 
                 case ActionType.Animation:
-                    // Animation использует Target, Param, ParamType, Value
+                    // Animation uses Target, Param, ParamType, Value
                     BlockType = default;
                     break;
 
                 case ActionType.SetComponentProperty:
-                    // SetComponentProperty использует Target и Param (имя свойства), Value (новое значение)
-                    // TargetId заполняется при компиляции из Target
+                    // SetComponentProperty uses Target and Param (property name), Value (new value)
+                    // TargetId is filled during compilation from Target
                     ParamType = default;
                     break;
                 case ActionType.Destroy:

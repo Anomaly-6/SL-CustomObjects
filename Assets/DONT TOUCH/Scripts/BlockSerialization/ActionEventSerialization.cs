@@ -72,7 +72,7 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
                     if (action == null)
                         continue;
 
-                    // Для Animation типа резолвим TargetId и ParamType
+                    // For Animation type, resolve TargetId and ParamType
                     if (action.Type == ActionType.Animation)
                     {
                         action.TargetId = action.Target != null
@@ -84,7 +84,7 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
                             action.ParamType = resolvedType;
                     }
                 
-                    // Для SetComponentProperty типа резолвим TargetId
+                    // For SetComponentProperty type, resolve TargetId
                     if (action.Type == ActionType.SetComponentProperty)
                     {
                         action.TargetId = action.Target != null
@@ -96,7 +96,7 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
                         }
                     }
                 
-                    // Очищаем нерелевантные параметры для всех типов
+                    // Clear irrelevant parameters for all types
                     action.EnsureDefaults();
                 }
             }
@@ -145,7 +145,7 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
                 if (action == null || action.TargetId == 0)
                     continue;
 
-                // Для Animation и SetComponentProperty типов восстанавливаем Target из TargetId
+                // For Animation and SetComponentProperty types, restore Target from TargetId
                 if (action.Type == ActionType.Animation || action.Type == ActionType.SetComponentProperty)
                 {
                     if (objectFromId.TryGetValue(action.TargetId, out Transform targetTransform))
@@ -159,7 +159,7 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
             if (target == null || string.IsNullOrEmpty(paramName))
                 return default;
 
-            // Искать в дочерних или родителских объектах НЕ НУЖНО.
+            // NO NEED to search in child or parent objects.
             Animator animator = target.GetComponent<Animator>();
 
             if (animator == null)

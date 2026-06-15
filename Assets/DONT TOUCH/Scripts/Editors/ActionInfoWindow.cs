@@ -22,42 +22,42 @@ namespace DONT_TOUCH.Scripts.Editors
         private static readonly WikiSection[] Sections =
         {
             new(
-                "Вводная информация",
+                "Introductory Information",
                 "console.infoicon.sml",
-                "Данные действия позволяют делать простые взаимодействия с игрой без обходимости создания плагина",
-                "Действия вызывается в том порядке в котором они расположены (сверух вниз)",
-                "Если нужного вам действия нету, то напишите мне об этом. (Если вы умеете писать код, то лучше сделайте Pull request в репозитории)"
+                "These actions allow simple interactions with the game without the need to create a plugin",
+                "Actions are called in the order they are placed (top to bottom)",
+                "If the action you need is missing, let me know. (If you know how to code, it's better to make a Pull Request in the repository)"
             ),
 
             new(
-                "Спец. тэги",
+                "Special Tags",
                 "console.infoicon.sml",
-                "Данные тэги можно использовать при выполнение действия <b>command</b>",
-                "<b>[p_id]</b> или <b>{p_id}</b>: Id игрока запустивший событие"
+                "These tags can be used when executing the <b>command</b> action",
+                "<b>[p_id]</b> or <b>{p_id}</b>: ID of the player who triggered the event"
             ),
 
             new(
-                "Доступные действия",
+                "Available Actions",
                 "console.infoicon.sml",
-                "<b>Command:</b> вызывает команду в админ панели игры.",
-                "<b>Animation:</b> изменяет параметры анимации.",
-                "<b>Set Component Property:</b> взаимодействие с другими объектами",
-                "<b>Destroy:</b> удаление объекта"),
+                "<b>Command:</b> calls a command in the game's admin panel.",
+                "<b>Animation:</b> changes animation parameters.",
+                "<b>Set Component Property:</b> interaction with other objects",
+                "<b>Destroy:</b> deletes the object"),
 
             new(
-                "Trigger события",
+                "Trigger Events",
                 "d_PlayButton",
-                "<b>On Enter:</b> срабатывает когда игрок входит в триггер",
-                "<b>On Exit:</b> срабатывает когда игрок выходит из триггера",
-                "<b>While Inside:</b> срабатывает пока игрок внутри триггера"),
+                "<b>On Enter:</b> triggers when a player enters the trigger",
+                "<b>On Exit:</b> triggers when a player exits the trigger",
+                "<b>While Inside:</b> triggers while the player is inside the trigger"),
 
             new(
-                "Interactable события",
+                "Interactable Events",
                 "d_PlayButton",
-                "<b>On Interacted:</b> игрок нажимает по Interactable (работает при <b>InteractionDuration</b> = 0)",
-                "<b>On Searching:</b> игрок начинает взаимодействовать с Interactable (работает при <b>InteractionDuration</b> > 0)",
-                "<b>On Searched:</b> игрок закончил взаимодействие с Interactable (работает при <b>InteractionDuration</b> > 0)",
-                "<b>On Search Aborted:</b> игрок отменил взаимодействие с Interactable (работает при <b>InteractionDuration</b> > 0)"),
+                "<b>On Interacted:</b> player clicks on the Interactable (works when <b>InteractionDuration</b> = 0)",
+                "<b>On Searching:</b> player starts interacting with the Interactable (works when <b>InteractionDuration</b> > 0)",
+                "<b>On Searched:</b> player finished interacting with the Interactable (works when <b>InteractionDuration</b> > 0)",
+                "<b>On Search Aborted:</b> player cancelled interaction with the Interactable (works when <b>InteractionDuration</b> > 0)"),
         };
 
         private Vector2 _scroll;

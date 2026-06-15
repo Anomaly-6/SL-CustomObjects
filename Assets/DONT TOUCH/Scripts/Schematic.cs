@@ -61,11 +61,11 @@ public class Schematic : SchematicBlock
                     BlockType.CullingParent)
                     continue;
                 if (blockData.Name != block.name) continue;
-                string errorMsg = $"Найдено несколько блоков с именем «{blockData.Name}»! Переименуйте их, чтобы каждый имел уникальное имя.";
+                string errorMsg = $"Multiple blocks found with the name '{blockData.Name}'! Rename them so that each has a unique name.";
                 EditorUtility.DisplayDialog(
-                    "Ошибка компиляции схемы",
+                    "Schematic Compilation Error",
                     errorMsg,
-                    "ОК"
+                    "OK"
                 );
                 Debug.LogError(errorMsg);
                 return;

@@ -225,7 +225,7 @@ public static class Decompiler
 
 			if (animatorObject == null)
 			{
-				Debug.LogError($"Аниматор \"{animatorName}\" не получилось загрузить по какой то причине.\nПопробуй заново сделать анимацию, либо тут какая то другая хуйня. Возможно при сохранение схематики анимация была в оперативной памяти и все сломалось");
+				Debug.LogError($"Failed to load animator \"{animatorName}\" for some reason.\nTry recreating the animation, or there is some other issue. Possibly the animation was in RAM when saving the schematic and everything broke.");
 				return false;
 			}
 			

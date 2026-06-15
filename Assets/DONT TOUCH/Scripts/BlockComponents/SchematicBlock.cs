@@ -11,7 +11,7 @@ public abstract class SchematicBlock : MonoBehaviour
 {
     public abstract BlockType BlockType { get; }
 
-    [Tooltip("Сглаживание передвижения объекта"), Range(0, 255)]
+    [Tooltip("Object movement smoothing"), Range(0, 255)]
     public byte MovementSmoothing = 60;
 
     public static T Create<T>(string prefabPath) where T : Object

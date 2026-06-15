@@ -13,7 +13,7 @@ namespace DONT_TOUCH.Scripts.BlockComponents
     {
         public override BlockType BlockType => BlockType.Light;
 
-        [Tooltip("Будет ли свет выключаться при выключения света в комплексе?")]
+        [Tooltip("Will the light turn off when the facility lights are turned off?")]
         public bool Flicker;
 
         public DefaultFacilityZone FlickerZone;
