@@ -13,6 +13,10 @@ namespace DONT_TOUCH.Scripts.BlockComponents
         public PrimitiveType Type;
         public override BlockType BlockType => BlockType.PlayerBlocker;
 
+        [Header("What can pass through the object?")]
+        public bool ItemsAllowed = true;
+        public bool BulletsAllowed = true;
+        
         internal MeshFilter _filter;
         private MeshRenderer _renderer;
         private Material _sharedTransparent;
@@ -23,6 +27,8 @@ namespace DONT_TOUCH.Scripts.BlockComponents
             block.Properties = new Dictionary<string, object>
             {
                 { "PrimitiveType", Type },
+                { nameof(ItemsAllowed), ItemsAllowed },
+                { nameof(BulletsAllowed), BulletsAllowed },
             };
 
             base.Compile(block);
@@ -30,12 +36,20 @@ namespace DONT_TOUCH.Scripts.BlockComponents
 
         public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
         {
-            PlayerBlockerComponent interactable =
+            PlayerBlockerComponent playerBlocker =
                 Instantiate(AssetDatabase.LoadAssetAtPath<PlayerBlockerComponent>("Assets/Resources/Blocks/PlayerBlocker.prefab"));
-            gameObject = interactable.gameObject;
+            gameObject = playerBlocker.gameObject;
 
-            interactable.Type = (PrimitiveType)Convert.ToInt32(block.Properties["PrimitiveType"]);
+            playerBlocker.Type = (PrimitiveType)Convert.ToInt32(block.Properties["PrimitiveType"]);
+            if (block.Properties.TryGetValue(nameof(ItemsAllowed), out var itemsAllowedObj))
+            {
+                playerBlocker.ItemsAllowed = Convert.ToBoolean(itemsAllowedObj);
+            }
 
+            if (block.Properties.TryGetValue(nameof(BulletsAllowed), out var bulletsAllowedObj))
+            {
+                playerBlocker.BulletsAllowed = Convert.ToBoolean(bulletsAllowedObj);
+            }
             base.Decompile(ref gameObject, block, parent);
         }
 
