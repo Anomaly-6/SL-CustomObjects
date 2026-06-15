@@ -59,6 +59,8 @@ namespace DONT_TOUCH.Scripts.BlockComponents
 
         private void Update()
         {
+            if (_filter == null)
+                return;
             _filter.hideFlags = HideFlags.HideInInspector;
         }
 
