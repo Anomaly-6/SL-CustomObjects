@@ -8,7 +8,6 @@ using UnityEngine;
 namespace DONT_TOUCH.Scripts.BlockComponents
 {
     [ExecuteInEditMode, SelectionBase]
-
     public class LightComponent : SchematicBlock
     {
         public override BlockType BlockType => BlockType.Light;
@@ -17,6 +16,17 @@ namespace DONT_TOUCH.Scripts.BlockComponents
         public bool Flicker;
 
         public DefaultFacilityZone FlickerZone;
+        public bool Cycle = false;
+        [Header("Audio (ShortClips)")] public string FileNameOn = string.Empty;
+        public string FileNameOff = string.Empty;
+
+        [Header("Time")] public bool RandomInRange = false;
+        [Min(0f)] public float TimeToOn = 1f;
+        [Min(0f)] public float TimeToOff = 2f;
+        [Header("Time to On"), Min(0)] public float MaxOn = 3f;
+        [Min(0f)] public float MinOn = 2f;
+        [Header("Time to Off"), Min(0f)] public float MaxOff = 3f;
+        [Min(0f)] public float MinOff = 2f;
 
         [HideInInspector] public LightType LightType;
         [HideInInspector] public float Intensity;
@@ -26,6 +36,19 @@ namespace DONT_TOUCH.Scripts.BlockComponents
         [HideInInspector] public float SpotAngle;
         [HideInInspector] public float InnerSpotAngle;
         [HideInInspector] public Color Color;
+
+        public void Update()
+        {
+            if (MaxOff < MinOff)
+            {
+                MaxOff = MinOff;
+            }
+
+            if (MaxOn < MinOn)
+            {
+                MaxOn = MinOn;
+            }
+        }
 
         public override void Compile(SchematicBlockData block)
         {
@@ -44,8 +67,24 @@ namespace DONT_TOUCH.Scripts.BlockComponents
                 { "ShadowType", light.shadows },
                 { nameof(Flicker), Flicker },
                 { nameof(FlickerZone), FlickerZone },
+                { nameof(Cycle), Cycle },
+                { "FileNameOn", FileNameOn },
+                { "FileNameOff", FileNameOff },
+                { "RandomInRange", RandomInRange },
             };
-
+            
+            if (RandomInRange)
+            {
+                block.Properties["MaxOn"] = MaxOn;
+                block.Properties["MinOn"] = MinOn;
+                block.Properties["MaxOff"] = MaxOff;
+                block.Properties["MinOff"] = MinOff;
+            }
+            else
+            {
+                block.Properties["TimeToOn"] = TimeToOn;
+                block.Properties["TimeToOff"] = TimeToOff;
+            }
             base.Compile(block);
         }
 
@@ -84,6 +123,61 @@ namespace DONT_TOUCH.Scripts.BlockComponents
             if (block.Properties.TryGetValue(nameof(FlickerZone), out object flickerZone))
             {
                 FlickerZone = (DefaultFacilityZone)Convert.ToInt32(flickerZone);
+            }
+
+            if (block.Properties.TryGetValue(nameof(Cycle), out var obj))
+            {
+                Cycle = Convert.ToBoolean(obj);
+            }
+            
+            if (block.Properties.TryGetValue(nameof(FileNameOn), out obj))
+            {
+                FileNameOn = Convert.ToString(obj);
+            }
+
+            if (block.Properties.TryGetValue(nameof(FileNameOff), out obj))
+            {
+                FileNameOff = Convert.ToString(obj);
+            }
+
+            if (block.Properties.TryGetValue(nameof(RandomInRange), out obj))
+            {
+                RandomInRange = Convert.ToBoolean(obj);
+            }
+
+            if (RandomInRange)
+            {
+                if (block.Properties.TryGetValue(nameof(MaxOn), out obj))
+                {
+                    MaxOn = Convert.ToSingle(obj);
+                }
+
+                if (block.Properties.TryGetValue(nameof(MinOn), out obj))
+                {
+                    MinOn = Convert.ToSingle(obj);
+                }
+
+                if (block.Properties.TryGetValue(nameof(MaxOff), out obj))
+                {
+                    MaxOff = Convert.ToSingle(obj);
+                }
+
+                if (block.Properties.TryGetValue(nameof(MinOff), out obj))
+                {
+                    MinOff = Convert.ToSingle(obj);
+                }
+            }
+            else
+            {
+                if (block.Properties.TryGetValue(nameof(TimeToOn), out obj))
+                {
+                    TimeToOn = Convert.ToSingle(obj);
+                }
+
+                if (block.Properties.TryGetValue(nameof(TimeToOff), out obj))
+                {
+                    TimeToOff = Convert.ToSingle(obj);
+                }
             }
 
             base.Decompile(ref gameObject, block, parent);
