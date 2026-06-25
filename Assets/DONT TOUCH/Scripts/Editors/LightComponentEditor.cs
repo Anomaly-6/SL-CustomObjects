@@ -9,7 +9,7 @@ namespace DONT_TOUCH.Scripts.Editors
     {
         private SerializedProperty _flicker;
         private SerializedProperty _cycle;
-        
+
         private SerializedProperty _randomInRange;
 
         private SerializedProperty _timeToOn;
@@ -24,7 +24,7 @@ namespace DONT_TOUCH.Scripts.Editors
         {
             _flicker = serializedObject.FindProperty("Flicker");
             _cycle = serializedObject.FindProperty("Cycle");
-            
+
             _randomInRange = serializedObject.FindProperty("RandomInRange");
             _timeToOn = serializedObject.FindProperty("TimeToOn");
             _timeToOff = serializedObject.FindProperty("TimeToOff");
@@ -47,15 +47,25 @@ namespace DONT_TOUCH.Scripts.Editors
                 nameof(LightComponent.MaxOn),
                 nameof(LightComponent.MinOn),
                 nameof(LightComponent.MaxOff),
-                nameof(LightComponent.MinOff)
+                nameof(LightComponent.MinOff),
+                nameof(ActionEventHostBlockBase.ActionEvents)
             );
 
             if (!_flicker.boolValue || !_cycle.boolValue)
             {
                 serializedObject.ApplyModifiedProperties();
+                GUILayout.Space(6f);
+                GUILayout.BeginHorizontal();
+                ActionEventEditorWindow.DrawOpenButton(
+                    (MonoBehaviour)target,
+                    "Open Actions Editor",
+                    "Edit Actions",
+                    GUILayout.Height(EditorGUIUtility.singleLineHeight + 2f));
+                ActionInfoWindow.DrawOpenButton("Action Info", GUILayout.Height(EditorGUIUtility.singleLineHeight + 2f));
+                GUILayout.EndHorizontal();
                 return;
             }
-            
+
             EditorGUILayout.PropertyField(_randomInRange);
 
             if (_randomInRange.boolValue)
@@ -71,8 +81,17 @@ namespace DONT_TOUCH.Scripts.Editors
                 EditorGUILayout.PropertyField(_timeToOn);
                 EditorGUILayout.PropertyField(_timeToOff);
             }
-
+            
             serializedObject.ApplyModifiedProperties();
+            GUILayout.Space(6f);
+            GUILayout.BeginHorizontal();
+            ActionEventEditorWindow.DrawOpenButton(
+                (MonoBehaviour)target,
+                "Open Actions Editor",
+                "Light Actions",
+                GUILayout.Height(EditorGUIUtility.singleLineHeight + 2f));
+            ActionInfoWindow.DrawOpenButton("Action Info", GUILayout.Height(EditorGUIUtility.singleLineHeight + 2f));
+            GUILayout.EndHorizontal();
         }
     }
 }

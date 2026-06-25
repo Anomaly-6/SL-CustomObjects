@@ -8,17 +8,23 @@ using UnityEngine;
 namespace DONT_TOUCH.Scripts.BlockComponents
 {
     [ExecuteInEditMode, SelectionBase]
-    public class LightComponent : SchematicBlock
+    public class LightComponent : ActionEventHostBlockBase
     {
         public override BlockType BlockType => BlockType.Light;
+        public override List<ActionEventList> CreateDefaultActionEvents()
+        {
+            return new List<ActionEventList>()
+            {
+                new("TurnOn", "Turn On"),
+                new("TurnOff", "Turn Off"),
+            };
+        }
 
         [Tooltip("Will the light turn off when the facility lights are turned off?")]
         public bool Flicker;
 
         public DefaultFacilityZone FlickerZone;
         public bool Cycle = false;
-        [Header("Audio (ShortClips)")] public string FileNameOn = string.Empty;
-        public string FileNameOff = string.Empty;
 
         [Header("Time")] public bool RandomInRange = false;
         [Min(0f)] public float TimeToOn = 1f;
@@ -52,6 +58,7 @@ namespace DONT_TOUCH.Scripts.BlockComponents
 
         public override void Compile(SchematicBlockData block)
         {
+            PrepareActionEventsForCompile();
             TryGetComponent(out Light light);
 
             block.Properties = new Dictionary<string, object>
@@ -68,8 +75,6 @@ namespace DONT_TOUCH.Scripts.BlockComponents
                 { nameof(Flicker), Flicker },
                 { nameof(FlickerZone), FlickerZone },
                 { nameof(Cycle), Cycle },
-                { "FileNameOn", FileNameOn },
-                { "FileNameOff", FileNameOff },
                 { "RandomInRange", RandomInRange },
             };
             
@@ -85,16 +90,19 @@ namespace DONT_TOUCH.Scripts.BlockComponents
                 block.Properties["TimeToOn"] = TimeToOn;
                 block.Properties["TimeToOff"] = TimeToOff;
             }
+
+            block.Properties[nameof(ActionEvents)] = ActionEvents;
             base.Compile(block);
         }
 
         public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
         {
-            LightType lightType = block.Properties.TryGetValue("LightType", out object objLightType)
+            var lightType = block.Properties.TryGetValue("LightType", out object objLightType)
                 ? (LightType)Convert.ToInt32(objLightType)
                 : LightType.Point;
-            Light light = Create<GameObject>($"Assets/Resources/Blocks/Lights/{lightType} Light.prefab")
-                .GetComponent<Light>();
+            
+            var lightComponent = Create<LightComponent>($"Assets/Resources/Blocks/Lights/{lightType} Light.prefab");
+            var light = lightComponent.GetComponent<Light>();
             gameObject = light.gameObject;
 
             light.color = PrimitiveComponent.GetColorFromString(block.Properties["Color"].ToString());
@@ -128,16 +136,6 @@ namespace DONT_TOUCH.Scripts.BlockComponents
             if (block.Properties.TryGetValue(nameof(Cycle), out var obj))
             {
                 Cycle = Convert.ToBoolean(obj);
-            }
-            
-            if (block.Properties.TryGetValue(nameof(FileNameOn), out obj))
-            {
-                FileNameOn = Convert.ToString(obj);
-            }
-
-            if (block.Properties.TryGetValue(nameof(FileNameOff), out obj))
-            {
-                FileNameOff = Convert.ToString(obj);
             }
 
             if (block.Properties.TryGetValue(nameof(RandomInRange), out obj))
@@ -179,6 +177,7 @@ namespace DONT_TOUCH.Scripts.BlockComponents
                     TimeToOff = Convert.ToSingle(obj);
                 }
             }
+            lightComponent.ReadActionEventsFromProperties(block.Properties, nameof(ActionEvents));
 
             base.Decompile(ref gameObject, block, parent);
         }

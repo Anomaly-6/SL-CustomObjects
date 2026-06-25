@@ -254,20 +254,20 @@ namespace DONT_TOUCH.Scripts.Editors
             int index = actionsProperty.arraySize;
             actionsProperty.InsertArrayElementAtIndex(index);
 
-            SerializedProperty element = actionsProperty.GetArrayElementAtIndex(index);
-            element.FindPropertyRelative(nameof(ActionGame.Type)).intValue = (int)ActionType.Command;
-            element.FindPropertyRelative(nameof(ActionGame.ActionDelay)).floatValue = 0;
-            element.FindPropertyRelative(nameof(ActionGame.Value)).stringValue = string.Empty;
-            element.FindPropertyRelative(nameof(ActionGame.Param)).stringValue = string.Empty;
-            element.FindPropertyRelative(nameof(ActionGame.ParamType)).intValue = 0;
-            element.FindPropertyRelative(nameof(ActionGame.TargetId)).intValue = 0;
-            element.FindPropertyRelative(nameof(ActionGame.Target)).objectReferenceValue = null;
-
-            SerializedProperty expandedProperty = element.FindPropertyRelative(nameof(ActionGame.EditorIsExpanded));
-            if (expandedProperty != null) expandedProperty.boolValue = true;
-
-            SerializedProperty nameProperty = element.FindPropertyRelative(nameof(ActionGame.Name));
-            if (nameProperty != null) nameProperty.stringValue = string.Empty;
+            // SerializedProperty element = actionsProperty.GetArrayElementAtIndex(index);
+            // element.FindPropertyRelative(nameof(ActionGame.Type)).intValue = (int)ActionType.Command;
+            // element.FindPropertyRelative(nameof(ActionGame.ActionDelay)).floatValue = 0;
+            // element.FindPropertyRelative(nameof(ActionGame.Value)).stringValue = string.Empty;
+            // element.FindPropertyRelative(nameof(ActionGame.Param)).stringValue = string.Empty;
+            // element.FindPropertyRelative(nameof(ActionGame.ParamType)).intValue = 0;
+            // element.FindPropertyRelative(nameof(ActionGame.TargetId)).intValue = 0;
+            // element.FindPropertyRelative(nameof(ActionGame.Target)).objectReferenceValue = null;
+            //
+            // SerializedProperty expandedProperty = element.FindPropertyRelative(nameof(ActionGame.EditorIsExpanded));
+            // if (expandedProperty != null) expandedProperty.boolValue = true;
+            //
+            // SerializedProperty nameProperty = element.FindPropertyRelative(nameof(ActionGame.Name));
+            // if (nameProperty != null) nameProperty.stringValue = string.Empty;
         }
 
         private static float GetActionElementHeight(SerializedProperty actionsProperty, int index)
