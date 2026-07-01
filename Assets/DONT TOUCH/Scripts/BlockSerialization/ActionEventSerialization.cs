@@ -95,6 +95,13 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
                             action.BlockType = block.BlockType;
                         }
                     }
+
+                    if (action.Type == ActionType.Destroy)
+                    {
+                        action.TargetId = action.Target != null
+                            ? action.Target.transform.GetInstanceID()
+                            : 0;
+                    }
                 
                     // Clear irrelevant parameters for all types
                     action.EnsureDefaults();
@@ -146,7 +153,7 @@ namespace DONT_TOUCH.Scripts.BlockSerialization
                     continue;
 
                 // For Animation and SetComponentProperty types, restore Target from TargetId
-                if (action.Type == ActionType.Animation || action.Type == ActionType.SetComponentProperty)
+                if (action.Type is ActionType.Animation or ActionType.SetComponentProperty or ActionType.Destroy)
                 {
                     if (objectFromId.TryGetValue(action.TargetId, out Transform targetTransform))
                         action.Target = targetTransform.gameObject;
