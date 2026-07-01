@@ -82,6 +82,42 @@ public abstract class SchematicBlock : MonoBehaviour
     {
         LockChildrenRecursive(transform);
     }
+    
+    [ContextMenu("Center Pivot To Children")]
+    public void CenterPivotToChildren()
+    {
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            Debug.LogWarning("Нет Renderer-компонентов у детей.");
+            return;
+        }
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+            bounds.Encapsulate(renderers[i].bounds);
+
+        Vector3 center = bounds.center;
+
+        Transform[] children = new Transform[transform.childCount];
+        Vector3[] worldPositions = new Vector3[transform.childCount];
+        Quaternion[] worldRotations = new Quaternion[transform.childCount];
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            children[i] = transform.GetChild(i);
+            worldPositions[i] = children[i].position;
+            worldRotations[i] = children[i].rotation;
+        }
+
+        transform.position = center;
+
+        for (int i = 0; i < children.Length; i++)
+        {
+            children[i].position = worldPositions[i];
+            children[i].rotation = worldRotations[i];
+        }
+    }
 
     private void LockChildrenRecursive(Transform parent)
     {

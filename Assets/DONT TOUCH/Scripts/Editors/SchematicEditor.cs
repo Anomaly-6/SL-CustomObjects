@@ -51,6 +51,12 @@ namespace DONT_TOUCH.Scripts.Editors
                 return;
             }
 
+            if (GUILayout.Button("Center Pivot To Children"))
+            {
+                schematic.CenterPivotToChildren();
+                return;
+            }
+
             if (GUILayout.Button("Compile"))
                 schematic.CompileSchematic();
         }
