@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DONT_TOUCH.Enums;
 using DONT_TOUCH.Scripts.BlockSerialization;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,7 +17,8 @@ namespace DONT_TOUCH.Scripts.BlockComponents
         [Header("What can pass through the object?")]
         public bool ItemsAllowed = true;
         public bool BulletsAllowed = true;
-        
+        public List<DefaultRoleTypeId> Roles = new();
+
         internal MeshFilter _filter;
         private MeshRenderer _renderer;
         private Material _sharedTransparent;
@@ -29,6 +31,7 @@ namespace DONT_TOUCH.Scripts.BlockComponents
                 { "PrimitiveType", Type },
                 { nameof(ItemsAllowed), ItemsAllowed },
                 { nameof(BulletsAllowed), BulletsAllowed },
+                { nameof(Roles), Roles },
             };
 
             base.Compile(block);
@@ -37,7 +40,9 @@ namespace DONT_TOUCH.Scripts.BlockComponents
         public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
         {
             PlayerBlockerComponent playerBlocker =
-                Instantiate(AssetDatabase.LoadAssetAtPath<PlayerBlockerComponent>("Assets/Resources/Blocks/PlayerBlocker.prefab"));
+                Instantiate(
+                    AssetDatabase.LoadAssetAtPath<PlayerBlockerComponent>(
+                        "Assets/Resources/Blocks/PlayerBlocker.prefab"));
             gameObject = playerBlocker.gameObject;
 
             playerBlocker.Type = (PrimitiveType)Convert.ToInt32(block.Properties["PrimitiveType"]);
@@ -50,6 +55,15 @@ namespace DONT_TOUCH.Scripts.BlockComponents
             {
                 playerBlocker.BulletsAllowed = Convert.ToBoolean(bulletsAllowedObj);
             }
+
+            if (block.Properties.TryGetValue(nameof(Roles), out var rolesObj))
+            {
+                foreach (var role in ((JArray)rolesObj).ToObject<List<DefaultRoleTypeId>>())
+                {
+                    playerBlocker.Roles.Add(role);
+                }
+            }
+
             base.Decompile(ref gameObject, block, parent);
         }
 
@@ -66,7 +80,7 @@ namespace DONT_TOUCH.Scripts.BlockComponents
         {
             _filter.hideFlags = HideFlags.HideInInspector;
             _renderer.hideFlags = HideFlags.HideInInspector;
-        
+
             if (_prevType == Type)
                 return;
 
