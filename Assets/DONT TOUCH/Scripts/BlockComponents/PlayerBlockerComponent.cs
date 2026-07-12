@@ -39,10 +39,7 @@ namespace DONT_TOUCH.Scripts.BlockComponents
 
         public override void Decompile(ref GameObject gameObject, SchematicBlockData block, Transform parent)
         {
-            PlayerBlockerComponent playerBlocker =
-                Instantiate(
-                    AssetDatabase.LoadAssetAtPath<PlayerBlockerComponent>(
-                        "Assets/Resources/Blocks/PlayerBlocker.prefab"));
+            PlayerBlockerComponent playerBlocker = Create<PlayerBlockerComponent>("Assets/Resources/Blocks/PlayerBlocker.prefab");
             gameObject = playerBlocker.gameObject;
 
             playerBlocker.Type = (PrimitiveType)Convert.ToInt32(block.Properties["PrimitiveType"]);
