@@ -5,77 +5,172 @@ namespace DONT_TOUCH.Scripts.Editors
 {
     public class ActionInfoWindow : EditorWindow
     {
-        private readonly struct WikiSection
+        private sealed class WikiSection
         {
-            public readonly string Title;
-            public readonly string IconName;
-            public readonly string[] Lines;
+            public readonly GUIContent TitleContent;
+            public readonly GUIContent[] Lines;
 
             public WikiSection(string title, string iconName, params string[] lines)
             {
-                Title = title;
-                IconName = iconName;
-                Lines = lines;
+                Texture icon = EditorGUIUtility.IconContent(iconName).image;
+                TitleContent = new GUIContent(title, icon);
+
+                Lines = new GUIContent[lines.Length];
+
+                for (int i = 0; i < lines.Length; i++)
+                    Lines[i] = new GUIContent("- " + lines[i]);
             }
         }
 
-        private static readonly WikiSection[] Sections =
+        private readonly struct LanguagePack
         {
-            new(
-                "Introductory Information",
-                "console.infoicon.sml",
-                "These actions allow simple interactions with the game without the need to create a plugin",
-                "Actions are called in the order they are placed (top to bottom)",
-                "If the action you need is missing, let me know. (If you know how to code, it's better to make a Pull Request in the repository)"
-            ),
+            public readonly string ReadOnlyTitle;
+            public readonly string ReadOnlyMessage;
+            public readonly WikiSection[] Sections;
 
-            new(
-                "Special Tags",
-                "console.infoicon.sml",
-                "These tags can be used when executing the <b>command</b> action",
-                "<b>[p_id]</b> or <b>{p_id}</b>: ID of the player who triggered the event"
-            ),
+            public LanguagePack(
+                string readOnlyTitle,
+                string readOnlyMessage,
+                WikiSection[] sections)
+            {
+                ReadOnlyTitle = readOnlyTitle;
+                ReadOnlyMessage = readOnlyMessage;
+                Sections = sections;
+            }
+        }
 
-            new(
-                "Available Actions",
-                "console.infoicon.sml",
-                "<b>Command:</b> calls a command in the game's admin panel.",
-                "<b>Animation:</b> changes animation parameters.",
-                "<b>Set Component Property:</b> interaction with other objects",
-                "<b>Destroy:</b> deletes the object"),
-
-            new(
-                "Trigger Events",
-                "d_PlayButton",
-                "<b>On Enter:</b> triggers when a player enters the trigger",
-                "<b>On Exit:</b> triggers when a player exits the trigger",
-                "<b>While Inside:</b> triggers while the player is inside the trigger"),
-
-            new(
-                "Interactable Events",
-                "d_PlayButton",
-                "<b>On Interacted:</b> player clicks on the Interactable (works when <b>InteractionDuration</b> = 0)",
-                "<b>On Searching:</b> player starts interacting with the Interactable (works when <b>InteractionDuration</b> > 0)",
-                "<b>On Searched:</b> player finished interacting with the Interactable (works when <b>InteractionDuration</b> > 0)",
-                "<b>On Search Aborted:</b> player cancelled interaction with the Interactable (works when <b>InteractionDuration</b> > 0)"),
+        private static readonly string[] LanguageTabs =
+        {
+            "English",
+            "Русский",
         };
 
+        private static readonly LanguagePack[] Languages =
+        {
+            new LanguagePack(
+                "Read Only",
+                "This window is informational only. To update the wiki, edit ActionInfoWindow.cs in code.",
+                new[]
+                {
+                    new WikiSection(
+                        "Introduction",
+                        "console.infoicon.sml",
+                        "These actions allow you to create simple interactions with the game without needing to create a plugin.",
+                        "Actions are executed in the order they are listed, from top to bottom.",
+                        "If the action you need is missing, contact the developer. If you know how to code, consider creating a pull request in the repository."),
+
+                    new WikiSection(
+                        "Special Tags",
+                        "console.infoicon.sml",
+                        "These tags can be used when executing the <b>Command</b> action.",
+                        "<b>[p_id]</b> or <b>{p_id}</b>: The ID of the player who triggered the event."),
+
+                    new WikiSection(
+                        "Available Actions",
+                        "console.infoicon.sml",
+                        "<b>Command:</b> Executes a command through the game's Remote Admin panel.",
+                        "<b>Animation:</b> Changes animation parameters.",
+                        "<b>Set Component Property:</b> Changes a property on another object's component.",
+                        "<b>Destroy:</b> Deletes an object."),
+
+                    new WikiSection(
+                        "Trigger Events",
+                        "d_PlayButton",
+                        "<b>On Enter:</b> Runs when a player enters the trigger.",
+                        "<b>On Exit:</b> Runs when a player exits the trigger.",
+                        "<b>While Inside:</b> Runs while a player remains inside the trigger."),
+
+                    new WikiSection(
+                        "Interactable Events",
+                        "d_PlayButton",
+                        "<b>On Interacted:</b> Runs when the player interacts with the Interactable. Used when <b>InteractionDuration</b> = 0.",
+                        "<b>On Searching:</b> Runs when the player begins interacting. Used when <b>InteractionDuration</b> > 0.",
+                        "<b>On Searched:</b> Runs when the player finishes interacting. Used when <b>InteractionDuration</b> > 0.",
+                        "<b>On Search Aborted:</b> Runs when the player cancels the interaction. Used when <b>InteractionDuration</b> > 0."),
+                }),
+
+            new LanguagePack(
+                "Только для чтения",
+                "Это окно предназначено только для информации. Чтобы обновить справку, измените ActionInfoWindow.cs в коде.",
+                new[]
+                {
+                    new WikiSection(
+                        "Вводная информация",
+                        "console.infoicon.sml",
+                        "Данные действия позволяют делать простые взаимодействия с игрой без необходимости создания плагина.",
+                        "Действия вызываются в том порядке, в котором они расположены, сверху вниз.",
+                        "Если нужного вам действия нет, напишите разработчику. Если вы умеете писать код, лучше создайте Pull Request в репозитории."),
+
+                    new WikiSection(
+                        "Спец. тэги",
+                        "console.infoicon.sml",
+                        "Данные тэги можно использовать при выполнении действия <b>Command</b>.",
+                        "<b>[p_id]</b> или <b>{p_id}</b>: ID игрока, запустившего событие."),
+
+                    new WikiSection(
+                        "Доступные действия",
+                        "console.infoicon.sml",
+                        "<b>Command:</b> вызывает команду в админ-панели игры.",
+                        "<b>Animation:</b> изменяет параметры анимации.",
+                        "<b>Set Component Property:</b> изменяет свойство компонента другого объекта.",
+                        "<b>Destroy:</b> удаляет объект."),
+
+                    new WikiSection(
+                        "Trigger события",
+                        "d_PlayButton",
+                        "<b>On Enter:</b> срабатывает, когда игрок входит в триггер.",
+                        "<b>On Exit:</b> срабатывает, когда игрок выходит из триггера.",
+                        "<b>While Inside:</b> срабатывает, пока игрок находится внутри триггера."),
+
+                    new WikiSection(
+                        "Interactable события",
+                        "d_PlayButton",
+                        "<b>On Interacted:</b> игрок нажимает на Interactable. Работает при <b>InteractionDuration</b> = 0.",
+                        "<b>On Searching:</b> игрок начинает взаимодействие с Interactable. Работает при <b>InteractionDuration</b> > 0.",
+                        "<b>On Searched:</b> игрок заканчивает взаимодействие с Interactable. Работает при <b>InteractionDuration</b> > 0.",
+                        "<b>On Search Aborted:</b> игрок отменяет взаимодействие с Interactable. Работает при <b>InteractionDuration</b> > 0."),
+                }),
+        };
+
+        private static readonly GUIContent HeroTitle =
+            new GUIContent("Action Info");
+
+        private static readonly GUIContent HeroSubtitle =
+            new GUIContent("Read-only wiki for actions");
+
+        private int _languageTab;
         private Vector2 _scroll;
+
+        private bool _styleSkin;
+
         private GUIStyle _heroTitleStyle;
         private GUIStyle _heroSubtitleStyle;
         private GUIStyle _cardStyle;
         private GUIStyle _sectionTitleStyle;
         private GUIStyle _lineStyle;
 
+        private LanguagePack CurrentLanguage
+        {
+            get
+            {
+                int index = Mathf.Clamp(_languageTab, 0, Languages.Length - 1);
+                return Languages[index];
+            }
+        }
+
         [MenuItem("SchematicManager/Action Info")]
         public static void OpenWindow()
         {
-            ActionInfoWindow window = GetWindow<ActionInfoWindow>("Action Info");
+            ActionInfoWindow window =
+                GetWindow<ActionInfoWindow>("Action Info");
+
             window.minSize = new Vector2(560f, 420f);
             window.Show();
         }
 
-        public static bool DrawOpenButton(string buttonText = "Open Action Info", params GUILayoutOption[] options)
+        public static bool DrawOpenButton(
+            string buttonText = "Open Action Info",
+            params GUILayoutOption[] options)
         {
             if (!GUILayout.Button(buttonText, options))
                 return false;
@@ -86,7 +181,7 @@ namespace DONT_TOUCH.Scripts.Editors
 
         private void OnEnable()
         {
-            EnsureStyles();
+            RebuildStyles();
         }
 
         private void OnGUI()
@@ -97,18 +192,37 @@ namespace DONT_TOUCH.Scripts.Editors
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
 
             DrawHero();
-            DrawReadOnlyNotice();
 
-            foreach (WikiSection section in Sections)
-                DrawSection(section);
+            _languageTab = GUILayout.Toolbar(
+                _languageTab,
+                LanguageTabs);
+
+            GUILayout.Space(6f);
+
+            LanguagePack language = CurrentLanguage;
+
+            DrawReadOnlyNotice(language);
+
+            WikiSection[] sections = language.Sections;
+
+            for (int i = 0; i < sections.Length; i++)
+                DrawSection(sections[i]);
 
             EditorGUILayout.EndScrollView();
         }
 
         private void EnsureStyles()
         {
-            if (_heroTitleStyle != null)
-                return;
+            if (_heroTitleStyle == null ||
+                _styleSkin != EditorGUIUtility.isProSkin)
+            {
+                RebuildStyles();
+            }
+        }
+
+        private void RebuildStyles()
+        {
+            _styleSkin = EditorGUIUtility.isProSkin;
 
             _heroTitleStyle = new GUIStyle(EditorStyles.boldLabel)
             {
@@ -116,6 +230,7 @@ namespace DONT_TOUCH.Scripts.Editors
                 fontSize = 19,
                 richText = true,
             };
+
             _heroTitleStyle.normal.textColor = Color.white;
 
             _heroSubtitleStyle = new GUIStyle(EditorStyles.label)
@@ -125,7 +240,9 @@ namespace DONT_TOUCH.Scripts.Editors
                 wordWrap = true,
                 richText = true,
             };
-            _heroSubtitleStyle.normal.textColor = new Color(0.92f, 0.95f, 1f, 1f);
+
+            _heroSubtitleStyle.normal.textColor =
+                new Color(0.92f, 0.95f, 1f, 1f);
 
             _cardStyle = new GUIStyle("HelpBox")
             {
@@ -148,40 +265,65 @@ namespace DONT_TOUCH.Scripts.Editors
 
         private void DrawWindowBackground()
         {
-            Color bottom = EditorGUIUtility.isProSkin
+            Color backgroundColor = EditorGUIUtility.isProSkin
                 ? new Color(0.1f, 0.12f, 0.17f, 1f)
                 : new Color(0.93f, 0.95f, 1f, 1f);
 
-            Rect full = new Rect(0f, 0f, position.width, position.height);
-
-            EditorGUI.DrawRect(full, bottom);
+            EditorGUI.DrawRect(
+                new Rect(0f, 0f, position.width, position.height),
+                backgroundColor);
         }
 
         private void DrawHero()
         {
-            Rect hero = GUILayoutUtility.GetRect(10f, 50f, GUILayout.ExpandWidth(true));
+            Rect heroRect = GUILayoutUtility.GetRect(
+                10f,
+                50f,
+                GUILayout.ExpandWidth(true));
 
             Color heroColor = EditorGUIUtility.isProSkin
                 ? new Color(0.2f, 0.27f, 0.42f, 0.95f)
                 : new Color(0.38f, 0.54f, 0.86f, 0.9f);
-            EditorGUI.DrawRect(hero, heroColor);
 
-            Rect titleRect = new Rect(hero.x + 10f, hero.y + 8f, hero.width - 20f, 24f);
-            Rect subtitleRect = new Rect(hero.x + 10f, hero.y + 23f, hero.width - 20f, 30f);
+            EditorGUI.DrawRect(heroRect, heroColor);
 
-            EditorGUI.LabelField(titleRect, "Action Info", _heroTitleStyle);
-            EditorGUI.LabelField(subtitleRect, "Read-only wiki for actions", _heroSubtitleStyle);
+            Rect titleRect = new Rect(
+                heroRect.x + 10f,
+                heroRect.y + 8f,
+                heroRect.width - 20f,
+                24f);
+
+            Rect subtitleRect = new Rect(
+                heroRect.x + 10f,
+                heroRect.y + 23f,
+                heroRect.width - 20f,
+                30f);
+
+            EditorGUI.LabelField(
+                titleRect,
+                HeroTitle,
+                _heroTitleStyle);
+
+            EditorGUI.LabelField(
+                subtitleRect,
+                HeroSubtitle,
+                _heroSubtitleStyle);
 
             GUILayout.Space(6f);
         }
 
-        private void DrawReadOnlyNotice()
+        private void DrawReadOnlyNotice(LanguagePack language)
         {
             GUILayout.BeginVertical(_cardStyle);
-            EditorGUILayout.LabelField("Read Only", _sectionTitleStyle);
+
             EditorGUILayout.LabelField(
-                "This window is informational only. To update the wiki, edit ActionInfoWindow.cs in code.",
+                language.ReadOnlyTitle,
+                _sectionTitleStyle);
+
+            EditorGUILayout.LabelField(
+                language.ReadOnlyMessage,
                 _lineStyle);
+
             GUILayout.EndVertical();
         }
 
@@ -189,24 +331,34 @@ namespace DONT_TOUCH.Scripts.Editors
         {
             GUILayout.BeginVertical(_cardStyle);
 
-            Texture icon = EditorGUIUtility.IconContent(section.IconName)?.image;
-            GUIContent title = new GUIContent(section.Title, icon);
-            EditorGUILayout.LabelField(title, _sectionTitleStyle);
+            EditorGUILayout.LabelField(
+                section.TitleContent,
+                _sectionTitleStyle);
 
-            for (int i = 0; i < section.Lines.Length; i++)
-                DrawWrappedBullet(section.Lines[i]);
+            GUIContent[] lines = section.Lines;
+
+            for (int i = 0; i < lines.Length; i++)
+                DrawWrappedLine(lines[i]);
 
             GUILayout.EndVertical();
         }
 
-        private void DrawWrappedBullet(string text)
+        private void DrawWrappedLine(GUIContent content)
         {
-            string bullet = "- " + text;
-            float width = Mathf.Max(140f, position.width - 72f);
-            float height = _lineStyle.CalcHeight(new GUIContent(bullet), width);
-            Rect lineRect = EditorGUILayout.GetControlRect(false, height);
-            EditorGUI.LabelField(lineRect, bullet, _lineStyle);
+            float availableWidth =
+                Mathf.Max(140f, position.width - 72f);
+
+            float requiredHeight =
+                _lineStyle.CalcHeight(content, availableWidth);
+
+            Rect lineRect = EditorGUILayout.GetControlRect(
+                false,
+                requiredHeight);
+
+            EditorGUI.LabelField(
+                lineRect,
+                content,
+                _lineStyle);
         }
     }
-
 }
