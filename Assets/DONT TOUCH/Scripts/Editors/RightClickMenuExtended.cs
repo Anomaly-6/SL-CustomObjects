@@ -203,6 +203,15 @@ public class RightClickMenuExtended
 	[MenuItem("GameObject/🛠️ MER Blocks/AudioPlayer", false, -1)]
 	private static void CreateAudioPlayer(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/AudioPlayer.prefab");
 
+	[MenuItem("GameObject/🛠️ MER Blocks/KillBox", false, -1)]
+	private static void CreateKillBox(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/KillBox.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/CustomRoomIdentifier", false, -1)]
+	private static void CreateCustomRoomIdentifier(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/CustomRoomIdentifier.prefab");
+
+	[MenuItem("GameObject/🛠️ MER Blocks/CustomZoneIdentifier", false, -1)]
+	private static void CreateZoneRoomIdentifier(MenuCommand menuCommand) => CreateBlock(menuCommand, "Assets/Resources/Blocks/CustomZoneIdentifier.prefab");
+
 	
 	private static void CreateBlock(MenuCommand menuCommand, string prefabPath)
 	{
