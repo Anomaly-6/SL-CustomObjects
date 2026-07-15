@@ -11,9 +11,19 @@ public class SchematicClusterOptimizerSettings
 {
     public List<BlockType> ExcludedBlockTypes = new()
     {
-        BlockType.Schematic, BlockType.CullingParent, BlockType.Door, BlockType.Interactable, BlockType.Trigger,
-        BlockType.PlayerSpawnPoint, BlockType.Pickup,
-        BlockType.Waypoint, BlockType.PlayerBlocker, BlockType.Light
+        BlockType.Schematic, 
+        BlockType.CullingParent, 
+        BlockType.Door, 
+        BlockType.Interactable, 
+        BlockType.Trigger,
+        BlockType.PlayerSpawnPoint, 
+        BlockType.Pickup,
+        BlockType.Waypoint, 
+        BlockType.PlayerBlocker, 
+        BlockType.Light, 
+        BlockType.KillBox, 
+        BlockType.CustomRoomIdentifier, 
+        BlockType.CustomZoneIdentifier
     };
 
     [Min(0f)] public float MaxDistanceForPrimitiveCluster = 2.5f;
