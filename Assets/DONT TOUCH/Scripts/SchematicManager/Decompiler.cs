@@ -45,6 +45,9 @@ public static class Decompiler
 			Dict.Add(BlockType.Clutter, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.ClutterComponent>());
 			Dict.Add(BlockType.Trigger, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.TriggerComponent>());
 			Dict.Add(BlockType.AudioPlayer, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.AudioPlayerComponent>());
+			Dict.Add(BlockType.KillBox, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.KillBoxComponent>());
+			Dict.Add(BlockType.CustomRoomIdentifier, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.CustomRoomIdentifierComponent>());
+			Dict.Add(BlockType.CustomZoneIdentifier, gameObject.AddComponent<DONT_TOUCH.Scripts.BlockComponents.CustomZoneIdentifierComponent>());
 			return this;
 		}
 	}
