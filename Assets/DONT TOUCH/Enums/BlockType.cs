@@ -24,5 +24,8 @@
         Clutter = 38,
         Trigger = 39,
         AudioPlayer = 40,
+        KillBox = 41,
+        CustomRoomIdentifier = 42,
+        CustomZoneIdentifier = 43,
     }
 }
