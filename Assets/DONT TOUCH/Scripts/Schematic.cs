@@ -58,7 +58,10 @@ public class Schematic : SchematicBlock
                     BlockType.MirrorPrefab or 
                     BlockType.PlayerBlocker or 
                     BlockType.Trigger or 
-                    BlockType.CullingParent)
+                    BlockType.CullingParent or
+                    BlockType.KillBox or
+                    BlockType.CustomRoomIdentifier or
+                    BlockType.CustomZoneIdentifier)
                     continue;
                 if (blockData.Name != block.name) continue;
                 string errorMsg = $"Multiple blocks found with the name '{blockData.Name}'! Rename them so that each has a unique name.";
